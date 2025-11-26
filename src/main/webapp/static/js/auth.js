@@ -6,8 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const identifierField = loginForm.username || loginForm.email || loginForm.querySelector('[name="identifier"]');
             const payload = {
-                identifier: loginForm.username.value || loginForm.email.value,
+                identifier: identifierField ? identifierField.value : '',
                 password: loginForm.password.value
             };
             await window.apiPost('/auth/login', payload);

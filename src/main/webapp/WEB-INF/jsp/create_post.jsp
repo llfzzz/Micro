@@ -37,6 +37,7 @@
 <script>window.APP_CTX='${ctx}';</script>
 <script src="${ctx}/static/js/api.js"></script>
 <script src="${ctx}/static/js/upload.js"></script>
+<script src="${ctx}/static/js/auth.js" defer></script>
 <script>
     const form = document.getElementById('create-form');
     const mediaInput = document.getElementById('media');

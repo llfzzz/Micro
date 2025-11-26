@@ -47,5 +47,6 @@
 <script>window.APP_CTX='${ctx}';</script>
 <script src="${ctx}/static/js/api.js"></script>
 <script src="${ctx}/static/js/post.js" defer></script>
+<script src="${ctx}/static/js/auth.js" defer></script>
 </body>
 </html>
