@@ -12,12 +12,12 @@
 <body class="auth-body">
 <div class="auth-card">
     <h1>加入 Micro</h1>
-    <p class="muted">创建你的轻量社交账号</p>
+    <p class="muted">创建你的账号</p>
     <form id="register-form" class="auth-form">
         <label>用户名
             <input type="text" name="username" required />
         </label>
-        <label>显示名称
+        <label>昵称
             <input type="text" name="displayName" required />
         </label>
         <label>邮箱
@@ -28,7 +28,7 @@
         </label>
         <button type="submit" class="btn primary">注册</button>
     </form>
-    <p class="muted swap-link">已经有账号？<a href="${ctx}/app/login">前往登录</a></p>
+    <p class="muted swap-link">已经有账号？<a href="${ctx}/app/login" style="color: #2563eb">前往登录</a></p>
 </div>
 <script>window.APP_CTX='${ctx}';</script>
 <script src="${ctx}/static/js/api.js"></script>

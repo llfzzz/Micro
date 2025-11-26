@@ -14,15 +14,15 @@
     <h1>欢迎回来</h1>
     <p class="muted">使用账号登录 Micro</p>
     <form id="login-form" class="auth-form">
-        <label>用户名或邮箱
-            <input type="text" name="username" placeholder="username / email" required />
+        <label>
+            <input type="text" name="username" placeholder="用户名/邮箱" required />
         </label>
-        <label>密码
+        <label>
             <input type="password" name="password" placeholder="••••••••" required />
         </label>
         <button type="submit" class="btn primary">登录</button>
     </form>
-    <p class="muted swap-link">还没有账号？<a href="${ctx}/app/register">立即注册</a></p>
+    <p class="muted swap-link">还没有账号？<a href="${ctx}/app/register" style="color: #2563eb">立即注册</a></p>
 </div>
 <script>window.APP_CTX='${ctx}';</script>
 <script src="${ctx}/static/js/api.js"></script>

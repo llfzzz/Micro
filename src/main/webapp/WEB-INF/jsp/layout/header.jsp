@@ -13,7 +13,7 @@
         <c:choose>
             <c:when test="${not empty sessionScope.userId}">
                 <a href="${ctx}/app/profile?id=${sessionScope.userId}" class="avatar-small" aria-label="查看个人资料"></a>
-                <button type="button" class="link" data-action="logout">退出</button>
+                <button type="button" class="btn ghost" data-action="logout">退出</button>
             </c:when>
             <c:otherwise>
                 <a href="${ctx}/app/login" class="btn ghost">登录</a>
