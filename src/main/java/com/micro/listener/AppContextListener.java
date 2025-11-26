@@ -15,12 +15,14 @@ import com.micro.dao.impl.UserDaoImpl;
 import com.micro.service.AdminService;
 import com.micro.service.AuthService;
 import com.micro.service.CommentService;
+import com.micro.service.FollowService;
 import com.micro.service.MediaService;
 import com.micro.service.PostService;
 import com.micro.service.UserService;
 import com.micro.service.impl.AdminServiceImpl;
 import com.micro.service.impl.AuthServiceImpl;
 import com.micro.service.impl.CommentServiceImpl;
+import com.micro.service.impl.FollowServiceImpl;
 import com.micro.service.impl.MediaServiceImpl;
 import com.micro.service.impl.PostServiceImpl;
 import com.micro.service.impl.UserServiceImpl;
@@ -97,8 +99,9 @@ public class AppContextListener implements ServletContextListener {
         CommentService commentService = new CommentServiceImpl(commentDao, postDao);
         MediaService mediaService = new MediaServiceImpl(mediaDao, storagePath);
         AdminService adminService = new AdminServiceImpl(userDao, postDao, commentDao);
+        FollowService followService = new FollowServiceImpl(followDao);
 
-        return new Components(userService, authService, postService, commentService, mediaService, adminService, followDao);
+        return new Components(userService, authService, postService, commentService, mediaService, adminService, followDao, followService);
     }
 
     private HikariDataSource buildDataSource(Properties properties) {
@@ -111,9 +114,16 @@ public class AppContextListener implements ServletContextListener {
             throw new IllegalStateException("Database url/user must be configured");
         }
 
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("MySQL driver not found", e);
+        }
+
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(jdbcUrl);
         config.setUsername(username);
+        config.setDriverClassName("com.mysql.cj.jdbc.Driver");
         if (password != null) {
             config.setPassword(password);
         }
@@ -163,6 +173,7 @@ public class AppContextListener implements ServletContextListener {
         private final MediaService mediaService;
         private final AdminService adminService;
         private final FollowDao followDao;
+        private final FollowService followService;
 
         public Components(UserService userService,
                           AuthService authService,
@@ -170,7 +181,8 @@ public class AppContextListener implements ServletContextListener {
                           CommentService commentService,
                           MediaService mediaService,
                           AdminService adminService,
-                          FollowDao followDao) {
+                          FollowDao followDao,
+                          FollowService followService) {
             this.userService = userService;
             this.authService = authService;
             this.postService = postService;
@@ -178,6 +190,7 @@ public class AppContextListener implements ServletContextListener {
             this.mediaService = mediaService;
             this.adminService = adminService;
             this.followDao = followDao;
+            this.followService = followService;
         }
 
         public UserService userService() {
@@ -206,6 +219,10 @@ public class AppContextListener implements ServletContextListener {
 
         public FollowDao followDao() {
             return followDao;
+        }
+
+        public FollowService followService() {
+            return followService;
         }
     }
 }

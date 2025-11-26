@@ -17,4 +17,6 @@ public interface PostDao {
     boolean softDelete(long postId, long operatorId);
 
     boolean updateCounts(long postId, int likeDelta, int commentDelta, int forwardDelta);
+
+    long countAll();
 }

@@ -1,6 +1,6 @@
-package com.micro.dao;
+package com.micro.service;
 
-public interface FollowDao {
+public interface FollowService {
     boolean follow(long followerId, long followeeId);
 
     boolean unfollow(long followerId, long followeeId);

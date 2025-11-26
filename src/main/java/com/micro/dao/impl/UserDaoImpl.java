@@ -139,6 +139,18 @@ public class UserDaoImpl extends BaseDao implements UserDao {
         }
     }
 
+    @Override
+    public long countAll() {
+        String sql = "SELECT COUNT(*) FROM users";
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next() ? rs.getLong(1) : 0L;
+        } catch (SQLException e) {
+            throw new IllegalStateException("Unable to count users", e);
+        }
+    }
+
     private Optional<User> queryOne(String sql, PreparedStatementSetter setter) {
         try (Connection connection = getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {

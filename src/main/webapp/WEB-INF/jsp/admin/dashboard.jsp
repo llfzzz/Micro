@@ -17,15 +17,15 @@
         <section class="card stat-grid">
             <div class="stat" data-stat="users">
                 <h4>用户总数</h4>
-                <strong id="stat-users">${adminStats.userCount != null ? adminStats.userCount : '--'}</strong>
+                <strong id="stat-users">${adminStats.users != null ? adminStats.users : '--'}</strong>
             </div>
             <div class="stat" data-stat="posts">
                 <h4>帖子总数</h4>
-                <strong id="stat-posts">${adminStats.postCount != null ? adminStats.postCount : '--'}</strong>
+                <strong id="stat-posts">${adminStats.posts != null ? adminStats.posts : '--'}</strong>
             </div>
             <div class="stat" data-stat="comments">
                 <h4>评论总数</h4>
-                <strong id="stat-comments">${adminStats.commentCount != null ? adminStats.commentCount : '--'}</strong>
+                <strong id="stat-comments">${adminStats.comments != null ? adminStats.comments : '--'}</strong>
             </div>
         </section>
         <section class="card">
@@ -59,7 +59,7 @@
                         </c:forEach>
                     </c:when>
                     <c:otherwise>
-                        <tr><td colspan="5" class="muted">加载中...</td></tr>
+                        <tr><td colspan="5" class="muted">暂无数据</td></tr>
                     </c:otherwise>
                 </c:choose>
                 </tbody>
@@ -96,7 +96,7 @@
                         </c:forEach>
                     </c:when>
                     <c:otherwise>
-                        <tr><td colspan="5" class="muted">加载中...</td></tr>
+                        <tr><td colspan="5" class="muted">暂无数据</td></tr>
                     </c:otherwise>
                 </c:choose>
                 </tbody>

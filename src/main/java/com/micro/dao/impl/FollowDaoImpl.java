@@ -58,7 +58,31 @@ public class FollowDaoImpl extends BaseDao implements FollowDao {
         }
     }
 
+    @Override
+    public long countFollowers(long userId) {
+        String sql = "SELECT COUNT(*) FROM follows WHERE followee_id=?";
+        return countBy(sql, userId);
+    }
+
+    @Override
+    public long countFollowing(long userId) {
+        String sql = "SELECT COUNT(*) FROM follows WHERE follower_id=?";
+        return countBy(sql, userId);
+    }
+
     private boolean isConstraintViolation(SQLException e) {
         return e.getSQLState() != null && e.getSQLState().startsWith("23");
+    }
+
+    private long countBy(String sql, long userId) {
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getLong(1) : 0L;
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Unable to count follow records", e);
+        }
     }
 }

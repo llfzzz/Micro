@@ -1,5 +1,4 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     String ctx = request.getContextPath();
     response.sendRedirect(ctx + "/app/feed");

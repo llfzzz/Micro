@@ -80,6 +80,18 @@ public class CommentDaoImpl extends BaseDao implements CommentDao {
         }
     }
 
+    @Override
+    public long countAll() {
+        String sql = "SELECT COUNT(*) FROM comments WHERE is_deleted=0";
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next() ? rs.getLong(1) : 0L;
+        } catch (SQLException e) {
+            throw new IllegalStateException("Unable to count comments", e);
+        }
+    }
+
     private Comment mapComment(ResultSet rs) throws SQLException {
         Comment comment = new Comment();
         comment.setId(rs.getLong("id"));

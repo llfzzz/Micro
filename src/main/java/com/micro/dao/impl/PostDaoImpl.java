@@ -100,6 +100,18 @@ public class PostDaoImpl extends BaseDao implements PostDao {
         }
     }
 
+    @Override
+    public long countAll() {
+        String sql = "SELECT COUNT(*) FROM posts WHERE is_deleted=0";
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next() ? rs.getLong(1) : 0L;
+        } catch (SQLException e) {
+            throw new IllegalStateException("Unable to count posts", e);
+        }
+    }
+
     private Optional<Post> queryOne(String sql, PreparedStatementSetter setter) {
         List<Post> posts = queryList(sql, setter);
         return posts.isEmpty() ? Optional.empty() : Optional.of(posts.get(0));

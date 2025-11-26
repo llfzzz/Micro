@@ -5,6 +5,7 @@ import com.micro.entity.Post;
 import com.micro.entity.User;
 import com.micro.listener.AppContextListener;
 import com.micro.service.AdminService;
+import com.micro.service.FollowService;
 import com.micro.service.MediaService;
 import com.micro.service.PostService;
 import com.micro.service.UserService;
@@ -31,6 +32,7 @@ public class PageServlet extends HttpServlet {
     private transient UserService userService;
     private transient MediaService mediaService;
     private transient AdminService adminService;
+    private transient FollowService followService;
 
     @Override
     public void init() throws ServletException {
@@ -39,6 +41,7 @@ public class PageServlet extends HttpServlet {
         this.userService = components.userService();
         this.mediaService = components.mediaService();
         this.adminService = components.adminService();
+        this.followService = components.followService();
     }
 
     @Override
@@ -123,11 +126,16 @@ public class PageServlet extends HttpServlet {
         List<Post> posts = postService.getByUser(userId, 0, 10);
         Map<String, Object> stats = new HashMap<>();
         stats.put("postCount", posts.size());
-        stats.put("followerCount", 0);
-        stats.put("followingCount", 0);
+        stats.put("followerCount", followService.countFollowers(userId));
+        stats.put("followingCount", followService.countFollowing(userId));
+        long viewerId = getSessionUserId(req);
+        boolean isOwner = viewerId > 0 && viewerId == userId;
+        boolean isFollowing = !isOwner && viewerId > 0 && followService.isFollowing(viewerId, userId);
         req.setAttribute("profileUser", profileUser.get());
         req.setAttribute("profilePosts", posts);
         req.setAttribute("profileStats", stats);
+        req.setAttribute("isOwner", isOwner);
+        req.setAttribute("isFollowing", isFollowing);
         forward(req, resp, "/WEB-INF/jsp/profile.jsp");
     }
 
@@ -143,10 +151,7 @@ public class PageServlet extends HttpServlet {
         }
         List<User> users = adminService.listUsers(0, 10);
         List<Post> posts = adminService.listPosts(0, 10);
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("userCount", users.size());
-        stats.put("postCount", posts.size());
-        stats.put("commentCount", posts.stream().mapToInt(Post::getCommentCount).sum());
+        Map<String, Long> stats = adminService.countStats();
         req.setAttribute("adminUsers", users);
         req.setAttribute("adminPosts", posts);
         req.setAttribute("adminStats", stats);

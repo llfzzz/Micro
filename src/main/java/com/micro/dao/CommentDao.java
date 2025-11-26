@@ -10,4 +10,6 @@ public interface CommentDao {
     List<Comment> listByPost(long postId, int offset, int limit);
 
     boolean softDelete(long commentId, long operatorId);
+
+    long countAll();
 }

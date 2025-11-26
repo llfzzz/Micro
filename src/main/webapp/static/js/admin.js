@@ -9,13 +9,27 @@ document.addEventListener('DOMContentLoaded', () => {
         comments: document.getElementById('stat-comments')
     };
 
+    async function loadStats() {
+        if (!stats.users || !stats.posts || !stats.comments) {
+            return;
+        }
+        try {
+            const data = await window.apiGet('/admin/stats');
+            stats.users.textContent = data.users ?? '--';
+            stats.posts.textContent = data.posts ?? '--';
+            stats.comments.textContent = data.comments ?? '--';
+        } catch (err) {
+            console.warn('load stats failed', err);
+            stats.users.textContent = stats.posts.textContent = stats.comments.textContent = '--';
+        }
+    }
+
     async function loadUsers() {
         if (!usersBody) return;
         usersBody.innerHTML = '<tr><td colspan="5" class="muted">加载中...</td></tr>';
         try {
             const data = await window.apiGet('/admin/users?limit=20');
             const items = data.items || [];
-            stats.users.textContent = items.length;
             usersBody.innerHTML = '';
             items.forEach((item) => {
                 const row = document.createElement('tr');
@@ -41,7 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const data = await window.apiGet('/admin/posts?limit=20');
             const items = data.items || [];
-            stats.posts.textContent = items.length;
             postsBody.innerHTML = '';
             items.forEach((item) => {
                 const row = document.createElement('tr');
@@ -56,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 postsBody.appendChild(row);
             });
-            stats.comments.textContent = items.reduce((sum, item) => sum + (item.commentCount || 0), 0);
         } catch (err) {
             postsBody.innerHTML = `<tr><td colspan="5" class="muted">${err.message}</td></tr>`;
         }
@@ -101,9 +113,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    refreshUsersBtn?.addEventListener('click', loadUsers);
-    refreshPostsBtn?.addEventListener('click', loadPosts);
+    refreshUsersBtn?.addEventListener('click', () => {
+        loadUsers();
+        loadStats();
+    });
+    refreshPostsBtn?.addEventListener('click', () => {
+        loadPosts();
+        loadStats();
+    });
 
+    loadStats();
     loadUsers();
     loadPosts();
 });

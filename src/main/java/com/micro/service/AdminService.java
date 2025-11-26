@@ -4,6 +4,7 @@ import com.micro.entity.Post;
 import com.micro.entity.User;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AdminService {
     List<User> listUsers(int offset, int limit);
@@ -15,4 +16,6 @@ public interface AdminService {
     boolean deleteComment(long commentId);
 
     boolean banUser(long userId, boolean banned);
+
+    Map<String, Long> countStats();
 }

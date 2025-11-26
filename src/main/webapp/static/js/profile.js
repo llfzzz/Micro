@@ -4,7 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!postsContainer) {
         return;
     }
+    const followText = followBtn?.querySelector('[data-follow-text]');
+    const followersStat = document.getElementById('stat-followers');
+    const followingStat = document.getElementById('stat-following');
     const userId = postsContainer.dataset.userId;
+    const fallbackUsername = postsContainer.dataset.username || 'user';
 
     async function loadPosts() {
         if (!userId) {
@@ -33,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             article.className = 'feed-card';
             article.innerHTML = `
                 <header>
-                    <strong>@${item.username || 'unknown'}</strong>
+                    <strong>@${item.username || fallbackUsername}</strong>
                     <span class="muted">${new Date(item.createdAt || Date.now()).toLocaleString()}</span>
                 </header>
                 <p>${item.contentText || ''}</p>
@@ -43,12 +47,59 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (followBtn) {
-        followBtn.addEventListener('click', () => {
-            followBtn.disabled = true;
-            followBtn.textContent = '功能待实现';
-        });
+    async function refreshFollowSummary() {
+        if (!userId) {
+            return;
+        }
+        try {
+            const data = await window.apiGet(`/follows/${userId}`);
+            updateFollowView(data);
+        } catch (err) {
+            // swallow to avoid blocking profile rendering
+            console.warn('follow summary load failed', err);
+        }
     }
 
+    function updateFollowView(data) {
+        if (followersStat && typeof data.followers === 'number') {
+            followersStat.textContent = data.followers;
+        }
+        if (followingStat && typeof data.following === 'number') {
+            followingStat.textContent = data.following;
+        }
+        updateFollowButton(Boolean(data.followingState));
+    }
+
+    function updateFollowButton(isFollowing) {
+        if (!followBtn) {
+            return;
+        }
+        followBtn.dataset.following = String(isFollowing);
+        if (followText) {
+            followText.textContent = isFollowing ? '已关注' : '关注';
+        }
+    }
+
+    followBtn?.addEventListener('click', async () => {
+        if (!userId) {
+            return;
+        }
+        followBtn.disabled = true;
+        const isFollowing = followBtn.dataset.following === 'true';
+        try {
+            if (isFollowing) {
+                await window.apiDelete(`/follows/${userId}`);
+            } else {
+                await window.apiPost(`/follows/${userId}`, {});
+            }
+            await refreshFollowSummary();
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            followBtn.disabled = false;
+        }
+    });
+
     loadPosts();
+    refreshFollowSummary();
 });

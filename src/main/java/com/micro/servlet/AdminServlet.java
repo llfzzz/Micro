@@ -37,10 +37,14 @@ public class AdminServlet extends BaseServlet {
         String path = req.getPathInfo();
         int offset = parseInt(req.getParameter("offset"), 0);
         int limit = parseInt(req.getParameter("limit"), 50);
-        if (path != null && path.startsWith("/users")) {
+        if (path == null || path.equals("/") || path.equals("/stats")) {
+            writeSuccess(resp, adminService.countStats());
+            return;
+        }
+        if (path.startsWith("/users")) {
             List<User> users = adminService.listUsers(offset, limit);
             writeSuccess(resp, Map.of("items", users));
-        } else if (path != null && path.startsWith("/posts")) {
+        } else if (path.startsWith("/posts")) {
             List<Post> posts = adminService.listPosts(offset, limit);
             writeSuccess(resp, Map.of("items", posts));
         } else {

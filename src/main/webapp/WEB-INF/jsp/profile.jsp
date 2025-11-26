@@ -1,6 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
+<c:set var="owner" value="${isOwner ne null ? isOwner : false}" />
+<c:set var="followingState" value="${isFollowing ne null ? isFollowing : false}" />
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -38,21 +40,28 @@
                         <p>${profileUser.bio != null ? profileUser.bio : '这个人很神秘，什么都没有写。'}</p>
                         <div class="stats">
                             <div>
-                                <span>${profileStats.postCount != null ? profileStats.postCount : 0}</span>
+                                <span id="stat-posts">${profileStats.postCount != null ? profileStats.postCount : 0}</span>
                                 <small>帖子</small>
                             </div>
                             <div>
-                                <span>${profileStats.followerCount != null ? profileStats.followerCount : 0}</span>
+                                <span id="stat-followers">${profileStats.followerCount != null ? profileStats.followerCount : 0}</span>
                                 <small>粉丝</small>
                             </div>
                             <div>
-                                <span>${profileStats.followingCount != null ? profileStats.followingCount : 0}</span>
+                                <span id="stat-following">${profileStats.followingCount != null ? profileStats.followingCount : 0}</span>
                                 <small>关注</small>
                             </div>
                         </div>
-                        <button id="follow-btn" class="btn ghost" data-user-id="${profileUser.id}">
-                            <span data-follow-text>关注</span>
-                        </button>
+                        <c:choose>
+                            <c:when test="${not owner}">
+                                <button id="follow-btn" class="btn ghost" data-user-id="${profileUser.id}" data-following="${followingState}">
+                                    <span data-follow-text>${followingState ? '已关注' : '关注'}</span>
+                                </button>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="${ctx}/app/profile/edit" class="btn ghost">编辑资料</a>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </section>
                 <section class="card">
@@ -60,7 +69,7 @@
                         <h3>最近动态</h3>
                         <a href="${ctx}/app/create-post" class="btn ghost">发布</a>
                     </div>
-                    <div id="profile-posts" data-user-id="${profileUser.id}">
+                    <div id="profile-posts" data-user-id="${profileUser.id}" data-username="${profileUser.username}">
                         <c:forEach var="post" items="${profilePosts}">
                             <article class="feed-card">
                                 <header>

@@ -23,4 +23,6 @@ public interface UserDao {
     List<User> list(int offset, int limit);
 
     boolean banUser(long userId, boolean banned);
+
+    long countAll();
 }

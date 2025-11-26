@@ -8,6 +8,7 @@ import com.micro.entity.User;
 import com.micro.service.AdminService;
 
 import java.util.List;
+import java.util.Map;
 
 public class AdminServiceImpl implements AdminService {
 
@@ -44,5 +45,14 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public boolean banUser(long userId, boolean banned) {
         return userDao.banUser(userId, banned);
+    }
+
+    @Override
+    public Map<String, Long> countStats() {
+        return Map.of(
+                "users", userDao.countAll(),
+                "posts", postDao.countAll(),
+                "comments", commentDao.countAll()
+        );
     }
 }
