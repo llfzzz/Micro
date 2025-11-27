@@ -20,7 +20,7 @@ async function uploadFile(formData, file, previewContainer) {
     card.textContent = `上传中：${file.name}`;
     previewContainer.appendChild(card);
 
-    const response = await fetch(`${window.APP_CTX || ''}/api/media/upload`, {
+    const response = await fetch(`${window.APP_CTX || ''}/api/uploads`, {
         method: 'POST',
         body: formData,
         credentials: 'include'

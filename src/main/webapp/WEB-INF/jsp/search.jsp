@@ -46,7 +46,7 @@
         <c:if test="${searchType == 'posts'}">
             <section id="feed-list">
                 <c:forEach var="post" items="${feedList}">
-                    <article class="card feed-card">
+                    <article class="card feed-card" onclick="window.location.href='${ctx}/app/post?id=${post.id}'" style="cursor:pointer">
                         <header>
                             <div>
                                 <strong>@${post.username}</strong>
@@ -58,7 +58,7 @@
                             </div>
                         </header>
                         <p>${post.contentText}</p>
-                        <a href="${ctx}/app/post?id=${post.id}" class="link">查看详情</a>
+                        <!-- Link removed -->
                     </article>
                 </c:forEach>
                 <c:if test="${empty feedList}">
@@ -71,6 +71,16 @@
 <jsp:include page="/WEB-INF/jsp/layout/footer.jsp" />
 <script>window.APP_CTX='${ctx}';</script>
 <script src="${ctx}/static/js/api.js"></script>
-<script src="${ctx}/static/js/auth.js" defer></script>
+<script src="${ctx}/static/js/auth.js?v=2" defer></script>
+<script>
+    // Cleanup legacy "View Detail" links if they exist
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.feed-card .link').forEach(link => {
+            if (link.textContent.includes('查看详情')) {
+                link.remove();
+            }
+        });
+    });
+</script>
 </body>
 </html>

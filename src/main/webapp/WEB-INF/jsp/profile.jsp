@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <c:set var="owner" value="${isOwner ne null ? isOwner : false}" />
 <c:set var="followingState" value="${isFollowing ne null ? isFollowing : false}" />
@@ -10,6 +11,7 @@
     <title>Micro · 个人主页</title>
     <link rel="stylesheet" href="${ctx}/static/css/base.css" />
     <link rel="stylesheet" href="${ctx}/static/css/profile.css" />
+    <link rel="stylesheet" href="${ctx}/static/css/feed.css" />
 </head>
 <body>
 <jsp:include page="/WEB-INF/jsp/layout/header.jsp" />
@@ -70,14 +72,21 @@
                         <a href="${ctx}/app/create-post" class="btn ghost">发布</a>
                     </div>
                     <div id="profile-posts" data-user-id="${profileUser.id}" data-username="${profileUser.username}">
+                        <!-- Profile Posts List -->
                         <c:forEach var="post" items="${profilePosts}">
-                            <article class="feed-card">
+                            <article class="card feed-card" data-post-id="${post.id}">
                                 <header>
                                     <strong>@${profileUser.username}</strong>
                                     <span class="muted">${post.createdAt}</span>
                                 </header>
-                                <p>${post.contentText}</p>
-                                <a href="${ctx}/app/post?id=${post.id}" class="link">查看详情 →</a>
+                                
+                                <!-- Text Content (Top) -->
+                                <div class="post-text-container">
+                                    <span class="content-text" data-full-text="${fn:escapeXml(post.contentText)}"></span>
+                                </div>
+
+                                <!-- Media Content (Bottom) -->
+                                <div class="post-media-container" style="display:none;" data-media='${post.mediaMetaJson}'></div>
                             </article>
                         </c:forEach>
                         <c:if test="${empty profilePosts}">
@@ -97,7 +106,7 @@
 <jsp:include page="/WEB-INF/jsp/layout/footer.jsp" />
 <script>window.APP_CTX='${ctx}';</script>
 <script src="${ctx}/static/js/api.js"></script>
-<script src="${ctx}/static/js/profile.js" defer></script>
+<script src="${ctx}/static/js/profile.js?v=2" defer></script>
 <script src="${ctx}/static/js/auth.js" defer></script>
 </body>
 </html>

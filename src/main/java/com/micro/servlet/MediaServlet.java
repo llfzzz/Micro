@@ -13,7 +13,7 @@ import javax.servlet.http.Part;
 import java.io.IOException;
 import java.util.Map;
 
-@WebServlet(urlPatterns = "/api/media/upload")
+@WebServlet(urlPatterns = "/api/upload")
 @MultipartConfig
 public class MediaServlet extends BaseServlet {
 
@@ -22,6 +22,11 @@ public class MediaServlet extends BaseServlet {
     @Override
     public void init() throws ServletException {
         this.mediaService = AppContextListener.getComponents(getServletContext()).mediaService();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        writeError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, 405, "Use POST to upload files");
     }
 
     @Override

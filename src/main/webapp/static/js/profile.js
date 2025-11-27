@@ -10,40 +10,147 @@ document.addEventListener('DOMContentLoaded', () => {
     const userId = postsContainer.dataset.userId;
     const fallbackUsername = postsContainer.dataset.username || 'user';
 
-    async function loadPosts() {
-        if (!userId) {
-            return;
+    // Cleanup legacy "View Detail" links if they exist
+    document.querySelectorAll('.feed-card .link').forEach(link => {
+        if (link.textContent.includes('查看详情')) {
+            link.remove();
         }
-        postsContainer.classList.add('loading');
-        try {
-            const params = new URLSearchParams({ userId, limit: '20' });
-            const data = await window.apiGet(`/posts?${params.toString()}`);
-            renderPosts(data.items || []);
-        } catch (err) {
-            postsContainer.innerHTML = `<p class="muted">${err.message}</p>`;
-        } finally {
-            postsContainer.classList.remove('loading');
-        }
+    });
+
+    // --- Feed Display Logic (Copied from feed.jsp) ---
+    function formatText(text) {
+        if (!text) return '';
+        let safe = text.replace(/&/g, "&amp;")
+                       .replace(/</g, "&lt;")
+                       .replace(/>/g, "&gt;")
+                       .replace(/"/g, "&quot;")
+                       .replace(/'/g, "&#039;");
+        
+        safe = safe.replace(/#([^#\s@]+)/g, (match, tag) => {
+            return `<a href="${window.APP_CTX}/app/search?q=%23${encodeURIComponent(tag)}" class="link-tag">${match}</a>`;
+        });
+
+        safe = safe.replace(/@([^#\s@]+)/g, (match, user) => {
+            return `<a href="${window.APP_CTX}/app/search?q=@${encodeURIComponent(user)}" class="link-mention">${match}</a>`;
+        });
+        
+        return safe;
     }
 
-    function renderPosts(items) {
-        postsContainer.innerHTML = '';
-        if (!items.length) {
-            postsContainer.innerHTML = '<p class="muted">暂无动态。</p>';
+    document.querySelectorAll('.feed-card').forEach(card => {
+        const textContainer = card.querySelector('.content-text');
+        if (!textContainer) return;
+        const fullText = textContainer.dataset.fullText || '';
+        const mediaContainer = card.querySelector('.post-media-container');
+        const mediaJson = mediaContainer ? mediaContainer.dataset.media : '[]';
+        
+        // 1. Text Folding
+        const LIMIT = 30;
+        if (fullText.length > LIMIT) {
+            const truncated = fullText.substring(0, LIMIT);
+            textContainer.innerHTML = `${formatText(truncated)}... <button class="expand-btn">展开</button>`;
+            
+            card.addEventListener('click', (e) => {
+                if (e.target.classList.contains('expand-btn')) {
+                    e.stopPropagation();
+                    textContainer.innerHTML = `${formatText(fullText)} <button class="collapse-btn">收起</button>`;
+                } else if (e.target.classList.contains('collapse-btn')) {
+                    e.stopPropagation();
+                    textContainer.innerHTML = `${formatText(truncated)}... <button class="expand-btn">展开</button>`;
+                } else if (e.target.tagName === 'A' || e.target.closest('a') || e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.closest('.carousel-prev') || e.target.closest('.carousel-next')) {
+                    return;
+                } else {
+                    const postId = card.dataset.postId;
+                    if (postId) {
+                        window.location.href = `${window.APP_CTX}/app/post?id=${postId}`;
+                    }
+                }
+            });
+        } else {
+            textContainer.innerHTML = formatText(fullText);
+            card.addEventListener('click', (e) => {
+                if (e.target.tagName === 'A' || e.target.closest('a') || e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.closest('.carousel-prev') || e.target.closest('.carousel-next')) {
+                    return;
+                }
+                const postId = card.dataset.postId;
+                if (postId) {
+                    window.location.href = `${window.APP_CTX}/app/post?id=${postId}`;
+                }
+            });
+        }
+        
+        // 2. Media Rendering
+        try {
+            const mediaList = JSON.parse(mediaJson || '[]');
+            if (mediaList.length > 0 && mediaContainer) {
+                mediaContainer.style.display = 'block';
+                renderCarousel(mediaContainer, mediaList);
+            }
+        } catch (e) { console.error('Media parse error', e); }
+    });
+
+    function renderCarousel(container, mediaList) {
+        const getUrl = (m) => {
+            if (m.url) return m.url;
+            if (m.path) return `${window.APP_CTX}/static/uploads/${m.path}`;
+            return '';
+        };
+
+        if (mediaList[0].type && mediaList[0].type.startsWith('video')) {
+            const src = getUrl(mediaList[0]);
+            container.innerHTML = `<video src="${src}" controls style="width:100%"></video>`;
             return;
         }
-        items.forEach((item) => {
-            const article = document.createElement('article');
-            article.className = 'feed-card';
-            article.innerHTML = `
-                <header>
-                    <strong>@${item.username || fallbackUsername}</strong>
-                    <span class="muted">${new Date(item.createdAt || Date.now()).toLocaleString()}</span>
-                </header>
-                <p>${item.contentText || ''}</p>
-                <a class="link" href="${window.APP_CTX || ''}/app/post?id=${item.id}">查看详情 →</a>
-            `;
-            postsContainer.appendChild(article);
+        
+        if (mediaList.length === 1) {
+             const src = getUrl(mediaList[0]);
+             container.innerHTML = `<img src="${src}" style="width:100%; display:block;">`;
+             return;
+        }
+        
+        let currentIndex = 0;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'carousel-wrapper';
+        
+        mediaList.forEach(m => {
+            const slide = document.createElement('div');
+            slide.className = 'carousel-slide';
+            slide.innerHTML = `<img src="${getUrl(m)}">`;
+            wrapper.appendChild(slide);
+        });
+        
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'carousel-prev';
+        prevBtn.innerHTML = '&#10094;';
+        
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'carousel-next';
+        nextBtn.innerHTML = '&#10095;';
+        
+        const counter = document.createElement('div');
+        counter.className = 'carousel-counter';
+        counter.textContent = `1 / ${mediaList.length}`;
+        
+        container.appendChild(wrapper);
+        container.appendChild(prevBtn);
+        container.appendChild(nextBtn);
+        container.appendChild(counter);
+        
+        function updateSlide() {
+            wrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
+            counter.textContent = `${currentIndex + 1} / ${mediaList.length}`;
+        }
+        
+        prevBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentIndex = (currentIndex - 1 + mediaList.length) % mediaList.length;
+            updateSlide();
+        });
+        
+        nextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentIndex = (currentIndex + 1) % mediaList.length;
+            updateSlide();
         });
     }
 
@@ -100,6 +207,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    loadPosts();
     refreshFollowSummary();
 });

@@ -14,20 +14,26 @@
 <div class="container">
     <main class="main">
         <article class="card">
+            <!-- Text Content (Top) -->
+            <div class="post-text-container">
+                <h2 class="content-text" data-full-text="${post.contentText}"></h2>
+            </div>
+            <p class="muted">发布于 ${post.createdAt}</p>
+            
+            <!-- Media Content (Bottom) -->
             <div class="post-hero">
                 <c:forEach var="media" items="${postMedia}">
                     <c:choose>
                         <c:when test="${media.type eq 'VIDEO'}">
-                            <video controls src="${ctx}/static/uploads/${media.path}"></video>
+                            <video controls src="${ctx}/static/uploads/${media.path}" style="width:100%"></video>
                         </c:when>
                         <c:otherwise>
-                            <img src="${ctx}/static/uploads/${media.path}" alt="媒体" />
+                            <img src="${ctx}/static/uploads/${media.path}" alt="媒体" style="width:100%; display:block; margin-bottom:10px;" />
                         </c:otherwise>
                     </c:choose>
                 </c:forEach>
             </div>
-            <h2>${post.contentText}</h2>
-            <p class="muted">发布于 ${post.createdAt}</p>
+            
             <div class="metrics">
                 <span>❤ ${post.likeCount}</span>
                 <span>💬 ${post.commentCount}</span>
@@ -46,7 +52,34 @@
 <jsp:include page="/WEB-INF/jsp/layout/footer.jsp" />
 <script>window.APP_CTX='${ctx}';</script>
 <script src="${ctx}/static/js/api.js"></script>
-<script src="${ctx}/static/js/post.js" defer></script>
+<script src="${ctx}/static/js/post.js?v=2" defer></script>
 <script src="${ctx}/static/js/auth.js" defer></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const textContainer = document.querySelector('.content-text');
+        if (textContainer) {
+            const fullText = textContainer.dataset.fullText || '';
+            textContainer.innerHTML = formatText(fullText);
+        }
+
+        function formatText(text) {
+            if (!text) return '';
+            let safe = text.replace(/&/g, "&amp;")
+                           .replace(/</g, "&lt;")
+                           .replace(/>/g, "&gt;")
+                           .replace(/"/g, "&quot;")
+                           .replace(/'/g, "&#039;");
+            
+            safe = safe.replace(/#([^#\s@]+)/g, (match, tag) => {
+                return `<a href="\${window.APP_CTX}/app/search?q=%23\${encodeURIComponent(tag)}" class="link-tag">\${match}</a>`;
+            });
+
+            safe = safe.replace(/@([^#\s@]+)/g, (match, user) => {
+                return `<a href="\${window.APP_CTX}/app/search?q=@\${encodeURIComponent(user)}" class="link-mention">\${match}</a>`;
+            });
+            return safe;
+        }
+    });
+</script>
 </body>
 </html>
