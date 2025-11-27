@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <!DOCTYPE html>
 <html lang="zh">
@@ -8,6 +9,7 @@
     <title>Micro · 帖子详情</title>
     <link rel="stylesheet" href="${ctx}/static/css/base.css" />
     <link rel="stylesheet" href="${ctx}/static/css/post.css" />
+    <link rel="stylesheet" href="${ctx}/static/css/feed.css" />
 </head>
 <body>
 <jsp:include page="/WEB-INF/jsp/layout/header.jsp" />
@@ -21,18 +23,7 @@
             <p class="muted">发布于 ${post.createdAt}</p>
             
             <!-- Media Content (Bottom) -->
-            <div class="post-hero">
-                <c:forEach var="media" items="${postMedia}">
-                    <c:choose>
-                        <c:when test="${media.type eq 'VIDEO'}">
-                            <video controls src="${ctx}/static/uploads/${media.path}" style="width:100%"></video>
-                        </c:when>
-                        <c:otherwise>
-                            <img src="${ctx}/static/uploads/${media.path}" alt="媒体" style="width:100%; display:block; margin-bottom:10px;" />
-                        </c:otherwise>
-                    </c:choose>
-                </c:forEach>
-            </div>
+            <div class="post-media-container" style="display:none;" data-media='${post.mediaMetaJson}'></div>
             
             <div class="metrics">
                 <span>❤ ${post.likeCount}</span>

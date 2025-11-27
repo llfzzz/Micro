@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function renderCarousel(container, mediaList) {
+        container.innerHTML = ''; // Clear container to prevent duplication
         const getUrl = (m) => {
             if (m.url) return m.url;
             if (m.path) return `${window.APP_CTX}/static/uploads/${m.path}`;

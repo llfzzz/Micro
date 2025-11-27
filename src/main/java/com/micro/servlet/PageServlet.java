@@ -303,6 +303,7 @@ public class PageServlet extends HttpServlet {
 			view.put("likeCount", post.getLikeCount());
 			view.put("commentCount", post.getCommentCount());
 			view.put("createdAt", post.getCreatedAt());
+			view.put("mediaMetaJson", post.getMediaMetaJson());
 			view.put("username", usernameCache.computeIfAbsent(post.getUserId(), this::resolveUsername));
 			return view;
 		}).collect(Collectors.toList());

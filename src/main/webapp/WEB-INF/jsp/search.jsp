@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <!DOCTYPE html>
 <html lang="zh">
@@ -57,8 +58,12 @@
                                 <span>💬 ${post.commentCount}</span>
                             </div>
                         </header>
-                        <p>${post.contentText}</p>
-                        <!-- Link removed -->
+                        <div class="post-text-container">
+                            <span class="content-text" data-full-text="${fn:escapeXml(post.contentText)}"></span>
+                        </div>
+
+                        <!-- Media Content (Bottom) -->
+                        <div class="post-media-container" style="display:none;" data-media='${post.mediaMetaJson}'></div>
                     </article>
                 </c:forEach>
                 <c:if test="${empty feedList}">
@@ -71,6 +76,7 @@
 <jsp:include page="/WEB-INF/jsp/layout/footer.jsp" />
 <script>window.APP_CTX='${ctx}';</script>
 <script src="${ctx}/static/js/api.js"></script>
+<script src="${ctx}/static/js/feed.js?v=2" defer></script>
 <script src="${ctx}/static/js/auth.js?v=2" defer></script>
 <script>
     // Cleanup legacy "View Detail" links if they exist
