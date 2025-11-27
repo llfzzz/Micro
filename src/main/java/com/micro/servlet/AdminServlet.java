@@ -42,11 +42,33 @@ public class AdminServlet extends BaseServlet {
             return;
         }
         if (path.startsWith("/users")) {
-            List<User> users = adminService.listUsers(offset, limit);
-            writeSuccess(resp, Map.of("items", users));
+            String keyword = trimToNull(req.getParameter("q"));
+            String role = trimToNull(req.getParameter("role"));
+            Boolean banned = parseTriState(req.getParameter("banned"));
+            List<User> users = adminService.searchUsers(keyword, role, banned, offset, limit);
+            long total = adminService.countUsers(keyword, role, banned);
+            writeSuccess(resp, Map.of(
+                    "items", users,
+                    "total", total,
+                    "offset", offset,
+                    "limit", limit
+            ));
         } else if (path.startsWith("/posts")) {
-            List<Post> posts = adminService.listPosts(offset, limit);
-            writeSuccess(resp, Map.of("items", posts));
+            String keyword = trimToNull(req.getParameter("q"));
+            Long userFilter = parseLongOrNull(req.getParameter("userId"));
+            String visibility = trimToNull(req.getParameter("visibility"));
+            Boolean deleted = parseTriState(req.getParameter("deleted"));
+            if (req.getParameter("deleted") == null) {
+                deleted = Boolean.FALSE;
+            }
+            List<Post> posts = adminService.searchPosts(userFilter, keyword, visibility, deleted, offset, limit);
+            long total = adminService.countPosts(userFilter, keyword, visibility, deleted);
+            writeSuccess(resp, Map.of(
+                    "items", posts,
+                    "total", total,
+                    "offset", offset,
+                    "limit", limit
+            ));
         } else {
             writeError(resp, HttpServletResponse.SC_NOT_FOUND, 4044, "Unknown admin endpoint");
         }
@@ -127,5 +149,33 @@ public class AdminServlet extends BaseServlet {
             }
         }
         return -1;
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private Boolean parseTriState(String value) {
+        String normalized = trimToNull(value);
+        if (normalized == null || "all".equalsIgnoreCase(normalized)) {
+            return null;
+        }
+        return Boolean.parseBoolean(normalized);
+    }
+
+    private Long parseLongOrNull(String value) {
+        String normalized = trimToNull(value);
+        if (normalized == null) {
+            return null;
+        }
+        try {
+            return Long.parseLong(normalized);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 }

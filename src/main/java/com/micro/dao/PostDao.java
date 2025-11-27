@@ -14,6 +14,10 @@ public interface PostDao {
 
     List<Post> listFeed(int offset, int limit);
 
+    List<Post> adminSearch(Long userId, String keyword, String visibility, Boolean deleted, int offset, int limit);
+
+    long countAdmin(Long userId, String keyword, String visibility, Boolean deleted);
+
     boolean softDelete(long postId, long operatorId);
 
     boolean updateCounts(long postId, int likeDelta, int commentDelta, int forwardDelta);

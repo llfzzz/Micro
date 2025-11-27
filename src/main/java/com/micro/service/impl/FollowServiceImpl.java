@@ -1,7 +1,10 @@
 package com.micro.service.impl;
 
 import com.micro.dao.FollowDao;
+import com.micro.entity.User;
 import com.micro.service.FollowService;
+
+import java.util.List;
 
 public class FollowServiceImpl implements FollowService {
 
@@ -50,6 +53,18 @@ public class FollowServiceImpl implements FollowService {
         return followDao.countFollowing(userId);
     }
 
+    @Override
+    public List<User> listFollowers(long userId, int offset, int limit) {
+        requirePositive(userId);
+        return followDao.listFollowers(userId, normalizeOffset(offset), normalizeLimit(limit));
+    }
+
+    @Override
+    public List<User> listFollowing(long userId, int offset, int limit) {
+        requirePositive(userId);
+        return followDao.listFollowing(userId, normalizeOffset(offset), normalizeLimit(limit));
+    }
+
     private void validateIds(long followerId, long followeeId) {
         requirePositive(followerId);
         requirePositive(followeeId);
@@ -59,5 +74,16 @@ public class FollowServiceImpl implements FollowService {
         if (id <= 0) {
             throw new IllegalArgumentException("Id must be positive");
         }
+    }
+
+    private int normalizeOffset(int offset) {
+        return Math.max(0, offset);
+    }
+
+    private int normalizeLimit(int limit) {
+        if (limit <= 0) {
+            return 20;
+        }
+        return Math.min(limit, 50);
     }
 }

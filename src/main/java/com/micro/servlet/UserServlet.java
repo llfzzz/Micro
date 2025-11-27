@@ -55,14 +55,28 @@ public class UserServlet extends BaseServlet {
             writeError(resp, HttpServletResponse.SC_FORBIDDEN, 4030, "Cannot modify other profile");
             return;
         }
+        Optional<User> currentUser = userService.findById(targetId);
+        if (currentUser.isEmpty()) {
+            writeError(resp, HttpServletResponse.SC_NOT_FOUND, 4042, "User not found");
+            return;
+        }
         User payload = readJson(req, User.class);
-        payload.setId(targetId);
-        boolean updated = userService.updateProfile(payload);
+        User merged = currentUser.get();
+        if (payload.getDisplayName() != null) {
+            merged.setDisplayName(payload.getDisplayName());
+        }
+        if (payload.getBio() != null) {
+            merged.setBio(payload.getBio());
+        }
+        if (payload.getEmail() != null) {
+            merged.setEmail(payload.getEmail());
+        }
+        boolean updated = userService.updateProfile(merged);
         if (!updated) {
             writeError(resp, HttpServletResponse.SC_BAD_REQUEST, 4005, "Update failed");
             return;
         }
-        writeSuccess(resp, sanitize(payload));
+        writeSuccess(resp, sanitize(merged));
     }
 
     @Override

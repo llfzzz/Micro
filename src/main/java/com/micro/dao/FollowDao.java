@@ -1,5 +1,9 @@
 package com.micro.dao;
 
+import com.micro.entity.User;
+
+import java.util.List;
+
 public interface FollowDao {
     boolean follow(long followerId, long followeeId);
 
@@ -10,4 +14,8 @@ public interface FollowDao {
     long countFollowers(long userId);
 
     long countFollowing(long userId);
+
+    List<User> listFollowers(long userId, int offset, int limit);
+
+    List<User> listFollowing(long userId, int offset, int limit);
 }

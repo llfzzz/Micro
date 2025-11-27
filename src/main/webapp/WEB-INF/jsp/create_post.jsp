@@ -79,7 +79,7 @@
             mediaMetaJson: mediaInput.dataset.mediaMeta || '[]'
         };
         await window.apiPost('/posts', payload);
-        window.location.href = `${window.APP_CTX}/app/feed`;
+        window.location.href = 'feed';
     });
 </script>
 </body>

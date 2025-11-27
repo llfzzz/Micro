@@ -43,14 +43,14 @@
                                 <span id="stat-posts">${profileStats.postCount != null ? profileStats.postCount : 0}</span>
                                 <small>帖子</small>
                             </div>
-                            <div>
+                            <a class="stat-link" href="${ctx}/app/follows?type=followers&id=${profileUser.id}">
                                 <span id="stat-followers">${profileStats.followerCount != null ? profileStats.followerCount : 0}</span>
                                 <small>粉丝</small>
-                            </div>
-                            <div>
+                            </a>
+                            <a class="stat-link" href="${ctx}/app/follows?type=following&id=${profileUser.id}">
                                 <span id="stat-following">${profileStats.followingCount != null ? profileStats.followingCount : 0}</span>
                                 <small>关注</small>
-                            </div>
+                            </a>
                         </div>
                         <c:choose>
                             <c:when test="${not owner}">

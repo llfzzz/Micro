@@ -39,6 +39,7 @@ import javax.servlet.annotation.WebListener;
 import javax.sql.DataSource;
 import java.io.File;
 import java.util.Properties;
+import java.util.TimeZone;
 
 /**
  * Bootstraps shared resources (DataSource, file storage path) for the Micro application.
@@ -57,6 +58,9 @@ public class AppContextListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+        // Set default timezone to Shanghai
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
+
         ServletContext context = sce.getServletContext();
         Properties properties = PropertyUtil.load("application.properties");
         context.setAttribute(APP_PROPERTIES_ATTR, properties);

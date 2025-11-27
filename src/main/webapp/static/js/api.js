@@ -18,4 +18,5 @@ async function apiRequest(path, options = {}) {
 }
 window.apiGet = (path) => apiRequest(path, { method: 'GET' });
 window.apiPost = (path, body) => apiRequest(path, { method: 'POST', body: JSON.stringify(body) });
+window.apiPut = (path, body) => apiRequest(path, { method: 'PUT', body: JSON.stringify(body) });
 window.apiDelete = (path) => apiRequest(path, { method: 'DELETE' });

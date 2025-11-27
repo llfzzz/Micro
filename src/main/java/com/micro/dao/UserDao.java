@@ -16,6 +16,10 @@ public interface UserDao {
 
     boolean update(User user);
 
+    List<User> search(String keyword, String role, Boolean banned, int offset, int limit);
+
+    long count(String keyword, String role, Boolean banned);
+
     boolean updatePassword(long userId, String passwordHash);
 
     boolean setAvatar(long userId, String avatarPath);

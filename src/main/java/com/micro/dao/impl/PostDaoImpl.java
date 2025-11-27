@@ -74,6 +74,33 @@ public class PostDaoImpl extends BaseDao implements PostDao {
     }
 
     @Override
+    public List<Post> adminSearch(Long userId, String keyword, String visibility, Boolean deleted, int offset, int limit) {
+        StringBuilder sql = new StringBuilder(BASE_SELECT).append(" WHERE 1=1");
+        var params = new ArrayList<Object>();
+        appendPostFilters(sql, params, userId, keyword, visibility, deleted);
+        sql.append(" ORDER BY created_at DESC LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+        return queryList(sql.toString(), ps -> setParams(ps, params));
+    }
+
+    @Override
+    public long countAdmin(Long userId, String keyword, String visibility, Boolean deleted) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM posts WHERE 1=1");
+        var params = new ArrayList<Object>();
+        appendPostFilters(sql, params, userId, keyword, visibility, deleted);
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            setParams(ps, params);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getLong(1) : 0L;
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Unable to count posts", e);
+        }
+    }
+
+    @Override
     public boolean softDelete(long postId, long operatorId) {
         String sql = "UPDATE posts SET is_deleted=1, updated_at=CURRENT_TIMESTAMP WHERE id=?";
         try (Connection connection = getConnection();
@@ -152,6 +179,42 @@ public class PostDaoImpl extends BaseDao implements PostDao {
 
     private LocalDateTime toLocalDateTime(Timestamp timestamp) {
         return timestamp == null ? null : timestamp.toLocalDateTime();
+    }
+
+    private void appendPostFilters(StringBuilder sql, List<Object> params, Long userId, String keyword, String visibility, Boolean deleted) {
+        if (userId != null && userId > 0) {
+            sql.append(" AND user_id=?");
+            params.add(userId);
+        }
+        if (keyword != null && !keyword.isBlank()) {
+            String like = "%" + keyword.trim() + "%";
+            sql.append(" AND (content_text LIKE ? OR link_url LIKE ?)");
+            params.add(like);
+            params.add(like);
+        }
+        if (visibility != null && !visibility.isBlank()) {
+            sql.append(" AND visibility=?");
+            params.add(visibility.toUpperCase());
+        }
+        if (deleted != null) {
+            sql.append(" AND is_deleted=?");
+            params.add(deleted ? 1 : 0);
+        }
+    }
+
+    private void setParams(PreparedStatement ps, List<Object> params) throws SQLException {
+        for (int i = 0; i < params.size(); i++) {
+            Object value = params.get(i);
+            if (value instanceof String) {
+                ps.setString(i + 1, (String) value);
+            } else if (value instanceof Integer) {
+                ps.setInt(i + 1, (Integer) value);
+            } else if (value instanceof Long) {
+                ps.setLong(i + 1, (Long) value);
+            } else {
+                ps.setObject(i + 1, value);
+            }
+        }
     }
 
     @FunctionalInterface

@@ -9,7 +9,15 @@ import java.util.Map;
 public interface AdminService {
     List<User> listUsers(int offset, int limit);
 
+    List<User> searchUsers(String keyword, String role, Boolean banned, int offset, int limit);
+
+    long countUsers(String keyword, String role, Boolean banned);
+
     List<Post> listPosts(int offset, int limit);
+
+    List<Post> searchPosts(Long userId, String keyword, String visibility, Boolean deleted, int offset, int limit);
+
+    long countPosts(Long userId, String keyword, String visibility, Boolean deleted);
 
     boolean deletePost(long postId);
 
