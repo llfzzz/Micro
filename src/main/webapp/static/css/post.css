@@ -1,3 +1,7 @@
+.post-detail-container {
+    justify-content: center;
+}
+
 .post-hero {
     border-radius: 16px;
     overflow: hidden;

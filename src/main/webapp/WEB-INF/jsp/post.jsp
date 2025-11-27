@@ -8,12 +8,12 @@
     <meta charset="UTF-8">
     <title>Micro · 帖子详情</title>
     <link rel="stylesheet" href="${ctx}/static/css/base.css" />
-    <link rel="stylesheet" href="${ctx}/static/css/post.css" />
+    <link rel="stylesheet" href="${ctx}/static/css/post.css?v=3" />
     <link rel="stylesheet" href="${ctx}/static/css/feed.css" />
 </head>
 <body>
 <jsp:include page="/WEB-INF/jsp/layout/header.jsp" />
-<div class="container">
+<div class="container post-detail-container">
     <main class="main">
         <article class="card">
             <!-- Text Content (Top) -->

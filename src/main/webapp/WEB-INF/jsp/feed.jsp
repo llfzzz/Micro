@@ -6,7 +6,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>Micro · 时间线</title>
+    <title>Micro · 主页</title>
     <link rel="stylesheet" href="${ctx}/static/css/base.css" />
     <link rel="stylesheet" href="${ctx}/static/css/feed.css" />
 </head>
@@ -18,9 +18,9 @@
         <div class="card">
             <h3>推荐话题</h3>
             <ul>
-                <li>#微分享</li>
-                <li>#技术流</li>
-                <li>#今日摄影</li>
+                <li>#哈哈</li>
+                <li>#哈哈哈</li>
+                <li>#哈哈哈哈</li>
             </ul>
         </div>
     </aside>
