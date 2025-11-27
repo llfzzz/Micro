@@ -49,4 +49,9 @@ public class UserServiceImpl implements UserService {
     public boolean banUser(long userId, boolean banned) {
         return userDao.banUser(userId, banned);
     }
+
+    @Override
+    public List<User> searchUsers(String query, int limit) {
+        return userDao.search(query, null, null, 0, limit);
+    }
 }

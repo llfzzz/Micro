@@ -23,4 +23,6 @@ public interface PostDao {
     boolean updateCounts(long postId, int likeDelta, int commentDelta, int forwardDelta);
 
     long countAll();
+
+    List<String> listContentWithTag(String tagPrefix, int limit);
 }

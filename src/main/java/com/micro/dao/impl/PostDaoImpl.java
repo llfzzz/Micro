@@ -139,6 +139,15 @@ public class PostDaoImpl extends BaseDao implements PostDao {
         }
     }
 
+    @Override
+    public List<String> listContentWithTag(String tagPrefix, int limit) {
+        String sql = "SELECT content_text FROM posts WHERE content_text LIKE ? AND is_deleted=0 ORDER BY created_at DESC LIMIT ?";
+        return queryList(sql, ps -> {
+            ps.setString(1, "%#" + tagPrefix + "%");
+            ps.setInt(2, limit);
+        }).stream().map(Post::getContentText).collect(java.util.stream.Collectors.toList());
+    }
+
     private Optional<Post> queryOne(String sql, PreparedStatementSetter setter) {
         List<Post> posts = queryList(sql, setter);
         return posts.isEmpty() ? Optional.empty() : Optional.of(posts.get(0));

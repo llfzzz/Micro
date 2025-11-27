@@ -61,4 +61,25 @@ public class PostServiceImpl implements PostService {
         }
         return alreadyLiked;
     }
+
+    @Override
+    public List<Post> search(String keyword, int offset, int limit) {
+        // Reuse adminSearch but enforce non-deleted and public visibility if needed.
+        // For now, assuming public search.
+        return postDao.adminSearch(null, keyword, null, false, offset, limit);
+    }
+
+    @Override
+    public List<String> searchTags(String query, int limit) {
+        // Fetch posts that might contain the tag
+        List<String> contents = postDao.listContentWithTag(query, 100);
+        return contents.stream()
+                .flatMap(text -> java.util.regex.Pattern.compile("#[\\w\\u4e00-\\u9fa5]+").matcher(text).results())
+                .map(java.util.regex.MatchResult::group)
+                .map(tag -> tag.substring(1)) // remove #
+                .filter(tag -> tag.startsWith(query))
+                .distinct()
+                .limit(limit)
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

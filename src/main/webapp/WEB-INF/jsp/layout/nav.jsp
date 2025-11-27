@@ -3,7 +3,7 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <nav class="side-nav">
     <ul>
-        <li><a href="${ctx}/app/feed">时间线</a></li>
+        <li><a href="${ctx}/app/feed">主页</a></li>
         <li><a href="${ctx}/app/create-post">发布</a></li>
         <li><a href="${ctx}/app/profile">我的主页</a></li>
         <li><a href="${ctx}/app/admin" class="muted">管理员</a></li>

@@ -37,10 +37,6 @@
                     <textarea id="contentText" name="contentText" class="textarea" placeholder="分享此刻..." required></textarea>
                 </div>
                 <div class="form-row">
-                    <label for="linkUrl">外链（可选）</label>
-                    <input type="url" id="linkUrl" name="linkUrl" placeholder="https://example.com" />
-                </div>
-                <div class="form-row">
                     <label>媒体文件</label>
                     <input type="file" id="media" multiple accept="image/*,video/*" />
                     <p class="muted small">可拖拽批量上传，支持图片与视频混合。</p>
@@ -75,7 +71,6 @@
         e.preventDefault();
         const payload = {
             contentText: form.contentText.value,
-            linkUrl: form.linkUrl.value,
             mediaMetaJson: mediaInput.dataset.mediaMeta || '[]'
         };
         await window.apiPost('/posts', payload);

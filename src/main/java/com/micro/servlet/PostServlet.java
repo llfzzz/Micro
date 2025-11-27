@@ -29,6 +29,8 @@ public class PostServlet extends BaseServlet {
         String path = req.getPathInfo();
         if (path == null || path.equals("/")) {
             handleFeed(req, resp);
+        } else if (path.endsWith("/tags")) {
+            handleTagSearch(req, resp);
         } else {
             long postId = extractId(path);
             if (postId < 0) {
@@ -113,6 +115,16 @@ public class PostServlet extends BaseServlet {
         }
         boolean result = postService.toggleLike(postId, userId);
         writeSuccess(resp, Map.of("liked", result));
+    }
+
+    private void handleTagSearch(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String query = req.getParameter("q");
+        if (query == null || query.isBlank()) {
+            writeSuccess(resp, List.of());
+            return;
+        }
+        List<String> tags = postService.searchTags(query, 50);
+        writeSuccess(resp, tags);
     }
 
     private long requireSessionUser(HttpServletRequest req, HttpServletResponse resp) throws IOException {

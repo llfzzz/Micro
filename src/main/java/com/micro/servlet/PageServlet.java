@@ -85,6 +85,9 @@ public class PageServlet extends HttpServlet {
 			case "follows":
 				handleFollows(req, resp);
 				return;
+			case "search":
+				handleSearch(req, resp);
+				return;
 			default:
 				break;
 		}
@@ -228,6 +231,38 @@ public class PageServlet extends HttpServlet {
 		req.setAttribute("followerCount", followService.countFollowers(userId));
 		req.setAttribute("followingCount", followService.countFollowing(userId));
 		forward(req, resp, "/WEB-INF/jsp/follow_list.jsp");
+	}
+
+	private void handleSearch(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+		String query = req.getParameter("q");
+		if (query == null) {
+			query = "";
+		}
+		query = query.trim();
+		req.setAttribute("searchQuery", query);
+
+		if (query.startsWith("@")) {
+			// Search users
+			String keyword = query.substring(1);
+			List<User> users = userService.searchUsers(keyword, 20);
+			req.setAttribute("searchType", "users");
+			req.setAttribute("userList", users);
+		} else {
+			// Search posts (including #tags)
+			// If query starts with #, we can strip it or just let the LIKE query handle it.
+			// But usually #tag search is exact or prefix.
+			// Our current adminSearch uses LIKE %keyword%, which works for #tag too.
+			// If user types "#java", it searches for "%#java%".
+			String keyword = query;
+			if (keyword.startsWith("#")) {
+				// Optional: if we want to search for the tag specifically, we might want to keep the #.
+				// But if the user just wants to search posts containing the tag, LIKE is fine.
+			}
+			List<Post> posts = postService.search(keyword, 0, 20);
+			req.setAttribute("searchType", "posts");
+			req.setAttribute("feedList", buildPostView(posts));
+		}
+		forward(req, resp, "/WEB-INF/jsp/search.jsp");
 	}
 
 	private void requireLoginOrRedirect(HttpServletRequest req, HttpServletResponse resp, ServletAction action) throws IOException, ServletException {

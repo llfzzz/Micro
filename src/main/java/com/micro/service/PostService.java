@@ -17,4 +17,8 @@ public interface PostService {
     boolean deletePost(long postId, long operatorId);
 
     boolean toggleLike(long postId, long userId);
+
+    List<Post> search(String keyword, int offset, int limit);
+
+    List<String> searchTags(String query, int limit);
 }

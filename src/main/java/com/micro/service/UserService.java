@@ -17,4 +17,6 @@ public interface UserService {
     List<User> list(int offset, int limit);
 
     boolean banUser(long userId, boolean banned);
+
+    List<User> searchUsers(String query, int limit);
 }

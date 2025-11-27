@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,6 +30,11 @@ public class UserServlet extends BaseServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String path = req.getPathInfo();
+        if (path == null || path.equals("/")) {
+            handleSearch(req, resp);
+            return;
+        }
         long userId = parseId(req, resp);
         if (userId < 0) {
             return;
@@ -39,6 +45,17 @@ public class UserServlet extends BaseServlet {
             return;
         }
         writeSuccess(resp, sanitize(user.get()));
+    }
+
+    private void handleSearch(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String query = req.getParameter("q");
+        if (query == null || query.isBlank()) {
+            writeSuccess(resp, List.of());
+            return;
+        }
+        var users = userService.searchUsers(query, 50);
+        var dtos = users.stream().map(this::sanitize).collect(java.util.stream.Collectors.toList());
+        writeSuccess(resp, dtos);
     }
 
     @Override

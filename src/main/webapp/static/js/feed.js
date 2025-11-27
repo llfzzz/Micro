@@ -37,11 +37,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <button class="btn ghost" data-like="${item.id}">❤ ${item.likeCount || 0}</button>
                 </header>
-                <p>${item.contentText || ''}</p>
+                <p>${formatContent(item.contentText || '')}</p>
             `;
             feedList.appendChild(card);
         });
     }
+
+    function formatContent(text) {
+        if (!text) return '';
+        // Format #tags
+        text = text.replace(/#([\w\u4e00-\u9fa5]+)/g, (match, tag) => {
+            return `<a href="${window.APP_CTX || ''}/app/search?q=%23${encodeURIComponent(tag)}" class="link-tag">${match}</a>`;
+        });
+        // Format @mentions
+        text = text.replace(/@([\w\u4e00-\u9fa5]+)/g, (match, name) => {
+            return `<a href="${window.APP_CTX || ''}/app/search?q=@${encodeURIComponent(name)}" class="link-mention">${match}</a>`;
+        });
+        return text;
+    }
+
+    // Initial format for server-rendered posts
+    document.querySelectorAll('.feed-card p').forEach(p => {
+        p.innerHTML = formatContent(p.textContent);
+    });
 
     if (feedList && sentinel) {
         const observer = new IntersectionObserver((entries) => {

@@ -26,3 +26,92 @@
     padding: 16px;
     color: var(--muted);
 }
+
+.suggestions-box {
+    position: absolute;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: scroll;
+    z-index: 1000;
+    width: 250px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    top: 100%;
+    left: 0;
+    scrollbar-width: none; /* Firefox */
+}
+
+.suggestions-box::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background: #f5f5f5;
+}
+
+.suggestion-item img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.suggestion-item div {
+    display: flex;
+    flex-direction: column;
+}
+
+.suggestion-item strong {
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.suggestion-item span {
+    font-size: 0.75rem;
+    color: #999;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #666;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.icon-btn:hover {
+    color: #333;
+    background: #eee;
+}
+
+.tools {
+    display: flex;
+    gap: 4px;
+}
+
+/* Link styling for tags and mentions */
+.link-tag, .link-mention {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.link-tag:hover, .link-mention:hover {
+    text-decoration: underline;
+}
