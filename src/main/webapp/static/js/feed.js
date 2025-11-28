@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return '';
         };
 
-        if (mediaList[0].type && mediaList[0].type.startsWith('video')) {
+        if (mediaList[0].type && mediaList[0].type.toLowerCase().startsWith('video')) {
             const src = getUrl(mediaList[0]);
             container.innerHTML = `<video src="${src}" controls style="width:100%"></video>`;
             return;
