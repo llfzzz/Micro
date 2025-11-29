@@ -117,13 +117,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (mediaList[0].type && mediaList[0].type.toLowerCase().startsWith('video')) {
             const src = getUrl(mediaList[0]);
-            container.innerHTML = `<video src="${src}" controls style="width:100%"></video>`;
+            container.innerHTML = `<video src="${src}" controls class="single-media"></video>`;
             return;
         }
         
         if (mediaList.length === 1) {
              const src = getUrl(mediaList[0]);
-             container.innerHTML = `<img src="${src}" style="width:100%; display:block;">`;
+             container.innerHTML = `<img src="${src}" class="single-media">`;
              return;
         }
         
@@ -183,27 +183,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const mediaJson = item.mediaMetaJson || '[]';
             
             card.innerHTML = `
-                <header>
-                    <div class="post-header-left">
-                        <div class="avatar">
-                            ${item.avatarPath ? `<img src="${window.APP_CTX}/static/uploads/${item.avatarPath}" alt="头像">` : ''}
-                        </div>
-                        <div class="user-info">
-                            <span class="display-name">${item.displayName || item.username || 'anonymous'}</span>
-                            <span class="username">@${item.username || 'anonymous'}</span>
-                            <span class="time-line">${new Date(item.createdAt || Date.now()).toLocaleString().replace(/\//g, '-')}</span>
-                        </div>
+                <div class="feed-avatar-col">
+                    <div class="avatar">
+                        ${item.avatarPath ? `<img src="${window.APP_CTX}/static/uploads/${item.avatarPath}" alt="头像">` : ''}
                     </div>
-                    <button class="btn ghost" data-like="${item.id}">❤ ${item.likeCount || 0}</button>
-                </header>
-                
-                <!-- Text Content (Top) -->
-                <div class="post-text-container">
-                    <span class="content-text" data-full-text="${(item.contentText || '').replace(/"/g, '&quot;')}"></span>
                 </div>
+                <div class="feed-content-col">
+                    <div class="post-header">
+                        <span class="display-name">${item.displayName || item.username || 'anonymous'}</span>
+                        <span class="username">@${item.username || 'anonymous'}</span>
+                        <span class="time-line">${new Date(item.createdAt || Date.now()).toLocaleString().replace(/\//g, '-').replace('T', ' ')}</span>
+                    </div>
+                    
+                    <!-- Text Content -->
+                    <div class="post-text-container">
+                        <span class="content-text" data-full-text="${(item.contentText || '').replace(/"/g, '&quot;')}"></span>
+                    </div>
 
-                <!-- Media Content (Bottom) -->
-                <div class="post-media-container" style="display:none;" data-media='${mediaJson}'></div>
+                    <!-- Media Content -->
+                    <div class="post-media-container" style="display:none;" data-media='${mediaJson}'></div>
+                    
+                    <div class="metrics">
+                        <button class="btn ghost" data-like="${item.id}">❤ ${item.likeCount || 0}</button>
+                        <span>💬 ${item.commentCount || 0}</span>
+                    </div>
+                </div>
             `;
             feedList.appendChild(card);
             
@@ -213,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const mediaContainer = card.querySelector('.post-media-container');
             
             // 1. Text Folding
-            const LIMIT = 30;
+            const LIMIT = 140; // Increased limit for better reading
             if (fullText.length > LIMIT) {
                 const truncated = fullText.substring(0, LIMIT);
                 textContainer.innerHTML = `${formatText(truncated)}... <button class="expand-btn">展开</button>`;

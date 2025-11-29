@@ -47,31 +47,34 @@
         <c:if test="${searchType == 'posts'}">
             <section id="feed-list">
                 <c:forEach var="post" items="${feedList}">
-                            <article class="card feed-card" onclick="window.location.href='${ctx}/app/post?id=${post.id}'" style="cursor:pointer">
-                            <header>
-                                <div class="post-header-left">
-                                    <div class="avatar" aria-hidden="true">
-                                        <c:if test="${not empty post.avatarPath}">
-                                            <img src="${ctx}/static/uploads/${post.avatarPath}" alt="头像" />
-                                        </c:if>
-                                    </div>
-                                    <div class="user-info">
-                                        <span class="display-name">${post.displayName != null ? post.displayName : post.username}</span>
-                                        <span class="username">@${post.username}</span>
-                                        <span class="time-line">${fn:replace(post.createdAt,'T',' ')}</span>
-                                    </div>
-                                </div>
-                                <div class="metrics">
-                                    <span>❤ ${post.likeCount}</span>
-                                    <span>💬 ${post.commentCount}</span>
-                                </div>
-                            </header>
-                        <div class="post-text-container">
-                            <span class="content-text" data-full-text="${fn:escapeXml(post.contentText)}"></span>
+                    <article class="card feed-card" onclick="window.location.href='${ctx}/app/post?id=${post.id}'" style="cursor:pointer">
+                        <div class="feed-avatar-col">
+                            <div class="avatar" aria-hidden="true">
+                                <c:if test="${not empty post.avatarPath}">
+                                    <img src="${ctx}/static/uploads/${post.avatarPath}" alt="头像" />
+                                </c:if>
+                            </div>
                         </div>
+                        <div class="feed-content-col">
+                            <div class="post-header">
+                                <span class="display-name">${post.displayName != null ? post.displayName : post.username}</span>
+                                <span class="username">@${post.username}</span>
+                                <span class="time-line">${fn:replace(post.createdAt,'T',' ')}</span>
+                            </div>
+                            
+                            <!-- Text Content -->
+                            <div class="post-text-container">
+                                <span class="content-text" data-full-text="${fn:escapeXml(post.contentText)}"></span>
+                            </div>
 
-                        <!-- Media Content (Bottom) -->
-                        <div class="post-media-container" style="display:none;" data-media='${post.mediaMetaJson}'></div>
+                            <!-- Media Content -->
+                            <div class="post-media-container" style="display:none;" data-media='${post.mediaMetaJson}'></div>
+                            
+                            <div class="metrics">
+                                <span>❤ ${post.likeCount}</span>
+                                <span>💬 ${post.commentCount}</span>
+                            </div>
+                        </div>
                     </article>
                 </c:forEach>
                 <c:if test="${empty feedList}">

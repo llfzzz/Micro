@@ -75,28 +75,33 @@
                         <!-- Profile Posts List -->
                         <c:forEach var="post" items="${profilePosts}">
                             <article class="card feed-card" data-post-id="${post.id}">
-                                <header>
-                                    <div class="post-header-left">
-                                        <div class="avatar" aria-hidden="true">
-                                            <c:if test="${not empty profileUser.avatarPath}">
-                                                <img src="${ctx}/static/uploads/${profileUser.avatarPath}" alt="头像" />
-                                            </c:if>
-                                        </div>
-                                        <div class="user-info">
-                                            <span class="display-name">${profileUser.displayName != null ? profileUser.displayName : profileUser.username}</span>
-                                            <span class="username">@${profileUser.username}</span>
-                                            <span class="time-line">${fn:replace(post.createdAt,'T',' ')}</span>
-                                        </div>
+                                <div class="feed-avatar-col">
+                                    <div class="avatar" aria-hidden="true">
+                                        <c:if test="${not empty profileUser.avatarPath}">
+                                            <img src="${ctx}/static/uploads/${profileUser.avatarPath}" alt="头像" />
+                                        </c:if>
                                     </div>
-                                </header>
-                                
-                                <!-- Text Content (Top) -->
-                                <div class="post-text-container">
-                                    <span class="content-text" data-full-text="${fn:escapeXml(post.contentText)}"></span>
                                 </div>
+                                <div class="feed-content-col">
+                                    <div class="post-header">
+                                        <span class="display-name">${profileUser.displayName != null ? profileUser.displayName : profileUser.username}</span>
+                                        <span class="username">@${profileUser.username}</span>
+                                        <span class="time-line">${fn:replace(post.createdAt,'T',' ')}</span>
+                                    </div>
+                                    
+                                    <!-- Text Content -->
+                                    <div class="post-text-container">
+                                        <span class="content-text" data-full-text="${fn:escapeXml(post.contentText)}"></span>
+                                    </div>
 
-                                <!-- Media Content (Bottom) -->
-                                <div class="post-media-container" style="display:none;" data-media='${post.mediaMetaJson}'></div>
+                                    <!-- Media Content -->
+                                    <div class="post-media-container" style="display:none;" data-media='${post.mediaMetaJson}'></div>
+                                    
+                                    <div class="metrics">
+                                        <span>❤ ${post.likeCount}</span>
+                                        <span>💬 ${post.commentCount}</span>
+                                    </div>
+                                </div>
                             </article>
                         </c:forEach>
                         <c:if test="${empty profilePosts}">

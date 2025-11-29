@@ -54,27 +54,38 @@ document.addEventListener('DOMContentLoaded', () => {
             return '';
         };
 
-        if (mediaList[0].type && mediaList[0].type.toLowerCase().startsWith('video')) {
-            const src = getUrl(mediaList[0]);
-            container.innerHTML = `<video src="${src}" controls style="width:100%"></video>`;
-            return;
-        }
-        
+        // Single Item
         if (mediaList.length === 1) {
-             const src = getUrl(mediaList[0]);
-             container.innerHTML = `<img src="${src}" style="width:100%; display:block;">`;
+             const m = mediaList[0];
+             const src = getUrl(m);
+             if (m.type && m.type.toLowerCase().startsWith('video')) {
+                 container.innerHTML = `<video src="${src}" controls class="detail-media"></video>`;
+             } else {
+                 container.innerHTML = `<img src="${src}" class="detail-media">`;
+             }
              return;
         }
         
+        // Multiple Items (Switching Mode for Adaptive Size)
         let currentIndex = 0;
         const wrapper = document.createElement('div');
-        wrapper.className = 'carousel-wrapper';
+        wrapper.className = 'detail-carousel-wrapper';
         
-        mediaList.forEach(m => {
+        const slides = [];
+        
+        mediaList.forEach((m, index) => {
             const slide = document.createElement('div');
-            slide.className = 'carousel-slide';
-            slide.innerHTML = `<img src="${getUrl(m)}">`;
+            slide.className = 'detail-carousel-slide';
+            slide.style.display = index === 0 ? 'block' : 'none'; // Only show first initially
+            
+            if (m.type && m.type.toLowerCase().startsWith('video')) {
+                slide.innerHTML = `<video src="${getUrl(m)}" controls class="detail-media"></video>`;
+            } else {
+                slide.innerHTML = `<img src="${getUrl(m)}" class="detail-media">`;
+            }
+            
             wrapper.appendChild(slide);
+            slides.push(slide);
         });
         
         const prevBtn = document.createElement('button');
@@ -95,7 +106,9 @@ document.addEventListener('DOMContentLoaded', () => {
         container.appendChild(counter);
         
         function updateSlide() {
-            wrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
+            slides.forEach((s, i) => {
+                s.style.display = i === currentIndex ? 'block' : 'none';
+            });
             counter.textContent = `${currentIndex + 1} / ${mediaList.length}`;
         }
         

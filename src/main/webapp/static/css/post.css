@@ -26,3 +26,37 @@
     padding: 12px 0;
     border-bottom: 1px solid var(--border);
 }
+
+/* Detail Page Media Overrides */
+.post-detail-container .post-media-container {
+    width: fit-content;
+    max-width: 100%;
+    margin-top: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: transparent;
+    display: block;
+}
+
+.detail-media {
+    display: block;
+    max-width: 100%;
+    height: auto !important; /* Force native height */
+    max-height: none !important; /* Ensure no max-height limit */
+    width: auto !important;  /* Force native width */
+    object-fit: contain;
+}
+
+.detail-carousel-wrapper {
+    display: block;
+    width: 100%;
+}
+
+.detail-carousel-slide {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start; /* Align left like feed */
+    background: transparent;
+}
+
