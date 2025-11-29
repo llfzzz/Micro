@@ -184,9 +184,15 @@ document.addEventListener('DOMContentLoaded', () => {
             
             card.innerHTML = `
                 <header>
-                    <div>
-                        <strong>@${item.username || 'anonymous'}</strong>
-                        <p class="muted">${new Date(item.createdAt || Date.now()).toLocaleString()}</p>
+                    <div class="post-header-left">
+                        <div class="avatar">
+                            ${item.avatarPath ? `<img src="${window.APP_CTX}/static/uploads/${item.avatarPath}" alt="头像">` : ''}
+                        </div>
+                        <div class="user-info">
+                            <span class="display-name">${item.displayName || item.username || 'anonymous'}</span>
+                            <span class="username">@${item.username || 'anonymous'}</span>
+                            <span class="time-line">${new Date(item.createdAt || Date.now()).toLocaleString().replace(/\//g, '-')}</span>
+                        </div>
                     </div>
                     <button class="btn ghost" data-like="${item.id}">❤ ${item.likeCount || 0}</button>
                 </header>

@@ -6,6 +6,8 @@
         <li><a href="${ctx}/app/feed">主页</a></li>
         <li><a href="${ctx}/app/create-post">发布</a></li>
         <li><a href="${ctx}/app/profile">我的主页</a></li>
-        <li><a href="${ctx}/app/admin" class="muted">管理员</a></li>
+        <c:if test="${sessionScope.role == 'ADMIN'}">
+            <li><a href="${ctx}/app/admin" class="muted">管理员</a></li>
+        </c:if>
     </ul>
 </nav>

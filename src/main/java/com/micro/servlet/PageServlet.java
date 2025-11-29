@@ -120,13 +120,30 @@ public class PageServlet extends HttpServlet {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "post id required");
 			return;
 		}
-		Optional<Post> post = postService.findById(postId);
-		if (post.isEmpty()) {
+		Optional<Post> postOpt = postService.findById(postId);
+		if (postOpt.isEmpty()) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "post not found");
 			return;
 		}
+		Post post = postOpt.get();
 		List<Media> mediaList = mediaService.getMediaByPost(postId);
-		req.setAttribute("post", post.get());
+		
+		// Build view map with user info
+		Map<String, Object> view = new HashMap<>();
+		view.put("id", post.getId());
+		view.put("userId", post.getUserId());
+		view.put("contentText", post.getContentText());
+		view.put("likeCount", post.getLikeCount());
+		view.put("commentCount", post.getCommentCount());
+		view.put("createdAt", post.getCreatedAt());
+		view.put("mediaMetaJson", post.getMediaMetaJson());
+		
+		Optional<User> userOpt = userService.findById(post.getUserId());
+		view.put("username", userOpt.map(User::getUsername).orElse("user-" + post.getUserId()));
+		view.put("displayName", userOpt.map(User::getDisplayName).orElse(null));
+		view.put("avatarPath", userOpt.map(User::getAvatarPath).orElse(null));
+
+		req.setAttribute("post", view);
 		req.setAttribute("postMedia", mediaList);
 		forward(req, resp, "/WEB-INF/jsp/post.jsp");
 	}
@@ -295,7 +312,6 @@ public class PageServlet extends HttpServlet {
 	}
 
 	private List<Map<String, Object>> buildPostView(List<Post> posts) {
-		Map<Long, String> usernameCache = new HashMap<>();
 		return posts.stream().map(post -> {
 			Map<String, Object> view = new HashMap<>();
 			view.put("id", post.getId());
@@ -304,15 +320,12 @@ public class PageServlet extends HttpServlet {
 			view.put("commentCount", post.getCommentCount());
 			view.put("createdAt", post.getCreatedAt());
 			view.put("mediaMetaJson", post.getMediaMetaJson());
-			view.put("username", usernameCache.computeIfAbsent(post.getUserId(), this::resolveUsername));
+			Optional<User> userOpt = userService.findById(post.getUserId());
+			view.put("username", userOpt.map(User::getUsername).orElse("user-" + post.getUserId()));
+			view.put("displayName", userOpt.map(User::getDisplayName).orElse(null));
+			view.put("avatarPath", userOpt.map(User::getAvatarPath).orElse(null));
 			return view;
 		}).collect(Collectors.toList());
-	}
-
-	private String resolveUsername(long userId) {
-		return userService.findById(userId)
-				.map(User::getUsername)
-				.orElse("user-" + userId);
 	}
 
 	private long parseLong(String value) {

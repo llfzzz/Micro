@@ -9,18 +9,31 @@
     <title>Micro · 帖子详情</title>
     <link rel="stylesheet" href="${ctx}/static/css/base.css" />
     <link rel="stylesheet" href="${ctx}/static/css/post.css?v=3" />
-    <link rel="stylesheet" href="${ctx}/static/css/feed.css" />
+    <link rel="stylesheet" href="${ctx}/static/css/feed.css?v=3" />
 </head>
 <body>
 <jsp:include page="/WEB-INF/jsp/layout/header.jsp" />
 <div class="container post-detail-container">
     <main class="main">
         <article class="card">
+            <header>
+                <div class="post-header-left">
+                    <div class="avatar" aria-hidden="true">
+                        <c:if test="${not empty post.avatarPath}">
+                            <img src="${ctx}/static/uploads/${post.avatarPath}" alt="头像" />
+                        </c:if>
+                    </div>
+                    <div class="user-info">
+                        <span class="display-name">${post.displayName != null ? post.displayName : post.username}</span>
+                        <span class="username">@${post.username}</span>
+                        <span class="time-line">发布于 ${fn:replace(post.createdAt,'T',' ')}</span>
+                    </div>
+                </div>
+            </header>
             <!-- Text Content (Top) -->
             <div class="post-text-container">
                 <h2 class="content-text" data-full-text="${post.contentText}"></h2>
             </div>
-            <p class="muted">发布于 ${post.createdAt}</p>
             
             <!-- Media Content (Bottom) -->
             <div class="post-media-container" style="display:none;" data-media='${post.mediaMetaJson}'></div>

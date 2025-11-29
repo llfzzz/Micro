@@ -11,17 +11,17 @@
     <title>Micro · 个人主页</title>
     <link rel="stylesheet" href="${ctx}/static/css/base.css" />
     <link rel="stylesheet" href="${ctx}/static/css/profile.css" />
-    <link rel="stylesheet" href="${ctx}/static/css/feed.css" />
+    <link rel="stylesheet" href="${ctx}/static/css/feed.css?v=3" />
 </head>
 <body>
 <jsp:include page="/WEB-INF/jsp/layout/header.jsp" />
 <div class="container">
     <aside class="aside">
         <jsp:include page="/WEB-INF/jsp/layout/nav.jsp" />
-        <div class="card profile-meta">
+                <div class="card profile-meta">
             <h3>账号概览</h3>
             <ul>
-                <li>注册时间：<span>${profileUser.createdAt != null ? profileUser.createdAt : '未知'}</span></li>
+                <li>注册时间：<span>${profileUser.createdAt != null ? fn:replace(profileUser.createdAt,'T',' ') : '未知'}</span></li>
                 <li>角色：<span>${profileUser.role != null ? profileUser.role : 'USER'}</span></li>
                 <li>状态：<span>${profileUser.banned ? '封禁' : '正常'}</span></li>
             </ul>
@@ -76,8 +76,18 @@
                         <c:forEach var="post" items="${profilePosts}">
                             <article class="card feed-card" data-post-id="${post.id}">
                                 <header>
-                                    <strong>@${profileUser.username}</strong>
-                                    <span class="muted">${post.createdAt}</span>
+                                    <div class="post-header-left">
+                                        <div class="avatar" aria-hidden="true">
+                                            <c:if test="${not empty profileUser.avatarPath}">
+                                                <img src="${ctx}/static/uploads/${profileUser.avatarPath}" alt="头像" />
+                                            </c:if>
+                                        </div>
+                                        <div class="user-info">
+                                            <span class="display-name">${profileUser.displayName != null ? profileUser.displayName : profileUser.username}</span>
+                                            <span class="username">@${profileUser.username}</span>
+                                            <span class="time-line">${fn:replace(post.createdAt,'T',' ')}</span>
+                                        </div>
+                                    </div>
                                 </header>
                                 
                                 <!-- Text Content (Top) -->

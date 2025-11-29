@@ -1,6 +1,8 @@
 package com.micro.servlet;
 
 import com.micro.entity.Post;
+import com.micro.entity.User;
+import com.micro.service.UserService;
 import com.micro.listener.AppContextListener;
 import com.micro.service.PostService;
 
@@ -18,10 +20,13 @@ import java.util.Optional;
 public class PostServlet extends BaseServlet {
 
     private transient PostService postService;
+    private transient UserService userService;
 
     @Override
     public void init() throws ServletException {
-        this.postService = AppContextListener.getComponents(getServletContext()).postService();
+        var components = AppContextListener.getComponents(getServletContext());
+        this.postService = components.postService();
+        this.userService = components.userService();
     }
 
     @Override
@@ -95,8 +100,30 @@ public class PostServlet extends BaseServlet {
         } else {
             posts = postService.getFeed(offset, limit);
         }
+        // map posts to lightweight view objects including username and avatarPath
+        List<Map<String, Object>> items = posts.stream().map(post -> {
+            Map<String, Object> v = new HashMap<>();
+            v.put("id", post.getId());
+            v.put("contentText", post.getContentText());
+            v.put("likeCount", post.getLikeCount());
+            v.put("commentCount", post.getCommentCount());
+            v.put("createdAt", post.getCreatedAt());
+            v.put("mediaMetaJson", post.getMediaMetaJson());
+            // resolve username and avatar path
+            userService.findById(post.getUserId()).ifPresentOrElse((User u) -> {
+                v.put("username", u.getUsername());
+                v.put("displayName", u.getDisplayName());
+                v.put("avatarPath", u.getAvatarPath());
+            }, () -> {
+                v.put("username", "user-" + post.getUserId());
+                v.put("displayName", null);
+                v.put("avatarPath", null);
+            });
+            return v;
+        }).toList();
+
         Map<String, Object> payload = new HashMap<>();
-        payload.put("items", posts);
+        payload.put("items", items);
         payload.put("offset", offset);
         payload.put("limit", limit);
         writeSuccess(resp, payload);

@@ -50,6 +50,7 @@ public class AuthServlet extends BaseServlet {
         long userId = authService.register(user, payload.password);
         user.setId(userId);
         req.getSession(true).setAttribute("userId", userId);
+        req.getSession(true).setAttribute("role", user.getRole());
         writeSuccess(resp, sanitize(user));
     }
 
@@ -66,6 +67,7 @@ public class AuthServlet extends BaseServlet {
         }
         User user = userOpt.get();
         req.getSession(true).setAttribute("userId", user.getId());
+        req.getSession(true).setAttribute("role", user.getRole());
         writeSuccess(resp, sanitize(user));
     }
 

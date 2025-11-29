@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <title>Micro · 主页</title>
     <link rel="stylesheet" href="${ctx}/static/css/base.css" />
-    <link rel="stylesheet" href="${ctx}/static/css/feed.css" />
+    <link rel="stylesheet" href="${ctx}/static/css/feed.css?v=3" />
 </head>
 <body>
 <jsp:include page="/WEB-INF/jsp/layout/header.jsp" />
@@ -42,9 +42,17 @@
             <c:forEach var="post" items="${feedList}">
                 <article class="card feed-card" data-post-id="${post.id}">
                     <header>
-                        <div>
-                            <strong>@${post.username}</strong>
-                            <p class="muted">${post.createdAt}</p>
+                        <div class="post-header-left">
+                            <div class="avatar" aria-hidden="true">
+                                <c:if test="${not empty post.avatarPath}">
+                                    <img src="${ctx}/static/uploads/${post.avatarPath}" alt="头像" />
+                                </c:if>
+                            </div>
+                            <div class="user-info">
+                                <span class="display-name">${post.displayName != null ? post.displayName : post.username}</span>
+                                <span class="username">@${post.username}</span>
+                                <span class="time-line">${fn:replace(post.createdAt,'T',' ')}</span>
+                            </div>
                         </div>
                         <div class="metrics">
                             <span>❤ ${post.likeCount}</span>
