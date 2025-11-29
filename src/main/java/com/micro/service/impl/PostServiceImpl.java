@@ -82,4 +82,9 @@ public class PostServiceImpl implements PostService {
                 .limit(limit)
                 .collect(java.util.stream.Collectors.toList());
     }
+
+    @Override
+    public boolean isLiked(long postId, long userId) {
+        return likeDao.exists(postId, userId);
+    }
 }

@@ -12,13 +12,16 @@
     <div class="user-menu">
         <c:choose>
             <c:when test="${not empty sessionScope.userId}">
+                <script>window.IS_LOGGED_IN = true;</script>
                 <a href="${ctx}/app/profile?id=${sessionScope.userId}" class="avatar-small" aria-label="查看个人资料"></a>
                 <button type="button" class="btn ghost" data-action="logout">退出</button>
             </c:when>
             <c:otherwise>
+                <script>window.IS_LOGGED_IN = false;</script>
                 <a href="${ctx}/app/login" class="btn ghost">登录</a>
                 <a href="${ctx}/app/register" class="btn primary">注册</a>
             </c:otherwise>
         </c:choose>
     </div>
 </header>
+<script src="${ctx}/static/js/interactions.js?v=1" defer></script>

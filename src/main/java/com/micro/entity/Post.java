@@ -25,6 +25,15 @@ public class Post {
     private String username;
     private String displayName;
     private String avatarPath;
+    private boolean liked;
+
+    public boolean isLiked() {
+        return liked;
+    }
+
+    public void setLiked(boolean liked) {
+        this.liked = liked;
+    }
 
     public List<Map<String, Object>> getMediaList() {
         if (mediaMetaJson == null || mediaMetaJson.isBlank()) {

@@ -204,8 +204,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="post-media-container" style="display:none;" data-media='${mediaJson}'></div>
                     
                     <div class="metrics">
-                        <button class="btn ghost" data-like="${item.id}">❤ ${item.likeCount || 0}</button>
-                        <span>💬 ${item.commentCount || 0}</span>
+                        <button class="metric-item" data-action="comment" data-id="${item.id}" data-username="${item.username}" data-displayname="${item.displayName || item.username}">
+                            <span class="metric-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.067c-4.49.1-8.183-3.51-8.183-8.01zm8.005-6c-3.317 0-6.005 2.69-6.005 6 0 3.37 2.77 6.08 6.138 6.01l.351-.01h1.761v2.3l5.087-2.81c1.951-1.08 3.163-3.13 3.163-5.36 0-3.39-2.744-6.13-6.129-6.13H9.756z"></path></svg>
+                            </span>
+                            <span>${item.commentCount || 0}</span>
+                        </button>
+                        <button class="metric-item" data-action="like" data-id="${item.id}" data-liked="${item.liked}">
+                            <span class="metric-icon">
+                                ${item.liked ? 
+                                `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#e0245e" stroke="#e0245e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>` : 
+                                `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`
+                                }
+                            </span>
+                            <span class="like-count">${item.likeCount || 0}</span>
+                        </button>
                     </div>
                 </div>
             `;
@@ -223,12 +236,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 textContainer.innerHTML = `${formatText(truncated)}... <button class="expand-btn">展开</button>`;
                 
                 card.addEventListener('click', (e) => {
+                    // ...existing code...
                     if (e.target.classList.contains('expand-btn')) {
                         e.stopPropagation();
                         textContainer.innerHTML = `${formatText(fullText)} <button class="collapse-btn">收起</button>`;
                     } else if (e.target.classList.contains('collapse-btn')) {
                         e.stopPropagation();
                         textContainer.innerHTML = `${formatText(truncated)}... <button class="expand-btn">展开</button>`;
+                    } else if (e.target.closest('.metric-item')) {
+                        // Handle metric clicks separately
+                        return;
                     } else if (e.target.tagName === 'A' || e.target.closest('a') || e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.closest('.carousel-prev') || e.target.closest('.carousel-next')) {
                         return;
                     } else {
@@ -238,6 +255,9 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 textContainer.innerHTML = formatText(fullText);
                 card.addEventListener('click', (e) => {
+                    if (e.target.closest('.metric-item')) {
+                        return;
+                    }
                     if (e.target.tagName === 'A' || e.target.closest('a') || e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.closest('.carousel-prev') || e.target.closest('.carousel-next')) {
                         return;
                     }
@@ -256,14 +276,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (feedList && sentinel) {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    loadMore();
-                }
-            });
-        });
-        observer.observe(sentinel);
-    }
+        // ...existing code...
+    // Initial Load
+    loadFeed();
+
+    // Infinite Scroll
+    window.addEventListener('scroll', () => {
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+            loadFeed();
+        }
+    });
 });

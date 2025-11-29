@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const commentList = document.getElementById('comment-list');
     const postId = commentForm?.dataset.postId || commentList?.dataset.postId;
 
-    async function refreshComments() {
+    window.refreshComments = async function() {
         if (!postId) return;
         const data = await window.apiGet(`/comments?postId=${postId}`);
         commentList.innerHTML = '';
@@ -27,11 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             await window.apiPost('/comments', payload);
             commentForm.reset();
-            refreshComments();
+            window.refreshComments();
         });
     }
 
-    refreshComments();
+    window.refreshComments();
 
     // --- Media Rendering (Copied from feed.js) ---
     const mediaContainer = document.querySelector('.post-media-container');

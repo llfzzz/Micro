@@ -100,6 +100,14 @@ public class PostServlet extends BaseServlet {
         } else {
             posts = postService.getFeed(offset, limit);
         }
+
+        long viewerId = -1;
+        var session = req.getSession(false);
+        if (session != null && session.getAttribute("userId") != null) {
+            viewerId = (long) session.getAttribute("userId");
+        }
+        final long currentUserId = viewerId;
+
         // map posts to lightweight view objects including username and avatarPath
         List<Map<String, Object>> items = posts.stream().map(post -> {
             Map<String, Object> v = new HashMap<>();
@@ -109,6 +117,7 @@ public class PostServlet extends BaseServlet {
             v.put("commentCount", post.getCommentCount());
             v.put("createdAt", post.getCreatedAt());
             v.put("mediaMetaJson", post.getMediaMetaJson());
+            v.put("liked", currentUserId > 0 && postService.isLiked(post.getId(), currentUserId));
             // resolve username and avatar path
             userService.findById(post.getUserId()).ifPresentOrElse((User u) -> {
                 v.put("username", u.getUsername());
@@ -141,7 +150,12 @@ public class PostServlet extends BaseServlet {
             return;
         }
         boolean result = postService.toggleLike(postId, userId);
-        writeSuccess(resp, Map.of("liked", result));
+        
+        // Fetch updated count
+        Optional<Post> updatedPost = postService.findById(postId);
+        int newCount = updatedPost.map(Post::getLikeCount).orElse(0);
+        
+        writeSuccess(resp, Map.of("liked", result, "likeCount", newCount));
     }
 
     private void handleTagSearch(HttpServletRequest req, HttpServletResponse resp) throws IOException {

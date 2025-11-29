@@ -109,7 +109,8 @@ public class PageServlet extends HttpServlet {
 
 	private void handleFeed(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		List<Post> posts = postService.getFeed(0, 10);
-		req.setAttribute("feedList", buildPostView(posts));
+		long viewerId = getSessionUserId(req);
+		req.setAttribute("feedList", buildPostView(posts, viewerId));
 		req.setAttribute("feedOffset", posts.size());
 		forward(req, resp, "/WEB-INF/jsp/feed.jsp");
 	}
@@ -128,6 +129,9 @@ public class PageServlet extends HttpServlet {
 		Post post = postOpt.get();
 		List<Media> mediaList = mediaService.getMediaByPost(postId);
 		
+		long viewerId = getSessionUserId(req);
+		boolean isLiked = viewerId > 0 && postService.isLiked(postId, viewerId);
+
 		// Build view map with user info
 		Map<String, Object> view = new HashMap<>();
 		view.put("id", post.getId());
@@ -137,6 +141,7 @@ public class PageServlet extends HttpServlet {
 		view.put("commentCount", post.getCommentCount());
 		view.put("createdAt", post.getCreatedAt());
 		view.put("mediaMetaJson", post.getMediaMetaJson());
+		view.put("liked", isLiked);
 		
 		Optional<User> userOpt = userService.findById(post.getUserId());
 		view.put("username", userOpt.map(User::getUsername).orElse("user-" + post.getUserId()));
@@ -163,11 +168,17 @@ public class PageServlet extends HttpServlet {
 			return;
 		}
 		List<Post> posts = postService.getByUser(userId, 0, 10);
+		
+		long viewerId = getSessionUserId(req);
+		if (viewerId > 0) {
+			posts.forEach(p -> p.setLiked(postService.isLiked(p.getId(), viewerId)));
+		}
+
 		Map<String, Object> stats = new HashMap<>();
 		stats.put("postCount", posts.size());
 		stats.put("followerCount", followService.countFollowers(userId));
 		stats.put("followingCount", followService.countFollowing(userId));
-		long viewerId = getSessionUserId(req);
+		
 		boolean isOwner = viewerId > 0 && viewerId == userId;
 		boolean isFollowing = !isOwner && viewerId > 0 && followService.isFollowing(viewerId, userId);
 		req.setAttribute("profileUser", profileUser.get());
@@ -277,7 +288,8 @@ public class PageServlet extends HttpServlet {
 			}
 			List<Post> posts = postService.search(keyword, 0, 20);
 			req.setAttribute("searchType", "posts");
-			req.setAttribute("feedList", buildPostView(posts));
+			long viewerId = getSessionUserId(req);
+			req.setAttribute("feedList", buildPostView(posts, viewerId));
 		}
 		forward(req, resp, "/WEB-INF/jsp/search.jsp");
 	}
@@ -311,7 +323,7 @@ public class PageServlet extends HttpServlet {
 		return userService.findById(userId);
 	}
 
-	private List<Map<String, Object>> buildPostView(List<Post> posts) {
+	private List<Map<String, Object>> buildPostView(List<Post> posts, long viewerId) {
 		return posts.stream().map(post -> {
 			Map<String, Object> view = new HashMap<>();
 			view.put("id", post.getId());
@@ -320,6 +332,7 @@ public class PageServlet extends HttpServlet {
 			view.put("commentCount", post.getCommentCount());
 			view.put("createdAt", post.getCreatedAt());
 			view.put("mediaMetaJson", post.getMediaMetaJson());
+			view.put("liked", viewerId > 0 && postService.isLiked(post.getId(), viewerId));
 			Optional<User> userOpt = userService.findById(post.getUserId());
 			view.put("username", userOpt.map(User::getUsername).orElse("user-" + post.getUserId()));
 			view.put("displayName", userOpt.map(User::getDisplayName).orElse(null));

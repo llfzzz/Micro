@@ -21,4 +21,6 @@ public interface PostService {
     List<Post> search(String keyword, int offset, int limit);
 
     List<String> searchTags(String query, int limit);
+
+    boolean isLiked(long postId, long userId);
 }
