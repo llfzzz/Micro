@@ -65,6 +65,23 @@ public class PostDaoImpl extends BaseDao implements PostDao {
     }
 
     @Override
+    public List<Post> listByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return new ArrayList<>();
+        }
+        StringBuilder sql = new StringBuilder(BASE_SELECT).append(" WHERE id IN (");
+        for (int i = 0; i < ids.size(); i++) {
+            sql.append(i == 0 ? "?" : ",?");
+        }
+        sql.append(") AND is_deleted=0 ORDER BY created_at DESC");
+        return queryList(sql.toString(), ps -> {
+            for (int i = 0; i < ids.size(); i++) {
+                ps.setLong(i + 1, ids.get(i));
+            }
+        });
+    }
+
+    @Override
     public List<Post> listFeed(int offset, int limit) {
         String sql = BASE_SELECT + " WHERE is_deleted=0 ORDER BY created_at DESC LIMIT ? OFFSET ?";
         return queryList(sql, ps -> {

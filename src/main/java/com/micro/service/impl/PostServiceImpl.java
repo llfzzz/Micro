@@ -87,4 +87,10 @@ public class PostServiceImpl implements PostService {
     public boolean isLiked(long postId, long userId) {
         return likeDao.exists(postId, userId);
     }
+
+    @Override
+    public List<Post> getLikedPosts(long userId, int offset, int limit) {
+        List<Long> postIds = likeDao.getLikedPostIds(userId, offset, limit);
+        return postDao.listByIds(postIds);
+    }
 }

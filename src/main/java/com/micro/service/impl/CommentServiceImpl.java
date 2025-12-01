@@ -30,6 +30,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public List<Comment> getUserReplies(long userId, int offset, int limit) {
+        return commentDao.listByUser(userId, offset, limit);
+    }
+
+    @Override
     public boolean deleteComment(long commentId, long operatorId) {
         boolean result = commentDao.softDelete(commentId, operatorId);
         if (result) {

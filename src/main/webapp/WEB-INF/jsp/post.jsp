@@ -15,6 +15,12 @@
 <jsp:include page="/WEB-INF/jsp/layout/header.jsp" />
 <div class="container post-detail-container">
     <main class="main">
+        <div class="card" style="display: flex; align-items: center; padding: 0 16px; height: 53px; margin-bottom: 16px;">
+            <button onclick="window.history.back()" style="background:none; border:none; cursor:pointer; padding: 8px; margin-left: -8px; border-radius: 50%; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.backgroundColor='rgba(15,20,25,0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 20px; height: 20px; fill: #0f1419;"><g><path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"></path></g></svg>
+            </button>
+            <span style="font-size: 20px; font-weight: 700; margin-left: 24px; color: #0f1419;">动态</span>
+        </div>
         <article class="card feed-card">
             <div class="feed-avatar-col">
                 <div class="avatar" aria-hidden="true">

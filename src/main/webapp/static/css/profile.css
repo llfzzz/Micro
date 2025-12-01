@@ -102,3 +102,113 @@
     background: rgba(248, 113, 113, 0.18);
     color: #b91c1c;
 }
+
+.card.no-padding {
+    padding: 0;
+}
+
+/* Profile Tabs */
+.profile-tabs {
+    display: flex;
+    border-bottom: 1px solid #eff3f4;
+    width: 100%;
+}
+
+.tab-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 53px;
+    color: #536471;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 16px;
+    transition: background-color 0.2s;
+    position: relative;
+    cursor: pointer;
+}
+
+.tab-item:hover {
+    background-color: rgba(15, 20, 25, 0.1);
+}
+
+.tab-item span {
+    position: relative;
+    padding: 14px 0;
+}
+
+.tab-item.active {
+    color: #0f1419;
+    font-weight: 700;
+}
+
+.tab-item.active span::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    min-width: 56px;
+    height: 4px;
+    background-color: #1d9bf0;
+    border-radius: 9999px;
+}
+
+/* Reply Thread View */
+.reply-thread {
+    display: flex;
+    flex-direction: column;
+    padding: 0 !important;
+    border-bottom: 1px solid #eff3f4;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.reply-thread:hover {
+    background-color: rgba(0,0,0,0.03);
+}
+
+.thread-parent {
+    display: flex;
+    gap: 12px;
+    padding: 12px 16px 0 16px;
+    align-items: stretch; /* Ensure avatar col stretches to show line */
+}
+
+.thread-reply {
+    display: flex;
+    gap: 12px;
+    padding: 12px 16px;
+}
+
+.thread-parent .feed-avatar-col {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 40px; /* Ensure fixed width */
+}
+
+.thread-parent .feed-avatar-col::after {
+    content: "";
+    flex: 1;
+    width: 2px;
+    background-color: #cfd9de;
+    margin-top: 4px;
+    margin-bottom: -12px; /* Extend into the next padding */
+}
+
+.thread-parent .post-text-container.muted {
+    color: #536471;
+    font-size: 15px;
+    margin-bottom: 4px;
+}
+
+.empty-state {
+    padding: 32px;
+    text-align: center;
+    color: #536471;
+    font-size: 15px;
+}

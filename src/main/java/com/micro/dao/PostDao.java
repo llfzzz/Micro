@@ -12,6 +12,8 @@ public interface PostDao {
 
     List<Post> listByUser(long userId, int offset, int limit);
 
+    List<Post> listByIds(List<Long> ids);
+
     List<Post> listFeed(int offset, int limit);
 
     List<Post> adminSearch(Long userId, String keyword, String visibility, Boolean deleted, int offset, int limit);

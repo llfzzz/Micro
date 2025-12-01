@@ -59,6 +59,26 @@ public class LikeDaoImpl extends BaseDao implements LikeDao {
         }
     }
 
+    @Override
+    public java.util.List<Long> getLikedPostIds(long userId, int offset, int limit) {
+        String sql = "SELECT post_id FROM likes WHERE user_id=? ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            ps.setInt(2, limit);
+            ps.setInt(3, offset);
+            try (ResultSet rs = ps.executeQuery()) {
+                java.util.List<Long> ids = new java.util.ArrayList<>();
+                while (rs.next()) {
+                    ids.add(rs.getLong("post_id"));
+                }
+                return ids;
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Unable to get liked post ids", e);
+        }
+    }
+
     private boolean isDuplicateEntry(SQLException e) {
         return e.getSQLState() != null && e.getSQLState().startsWith("23");
     }

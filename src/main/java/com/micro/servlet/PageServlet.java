@@ -1,10 +1,12 @@
 package com.micro.servlet;
 
+import com.micro.entity.Comment;
 import com.micro.entity.Media;
 import com.micro.entity.Post;
 import com.micro.entity.User;
 import com.micro.listener.AppContextListener;
 import com.micro.service.AdminService;
+import com.micro.service.CommentService;
 import com.micro.service.FollowService;
 import com.micro.service.MediaService;
 import com.micro.service.PostService;
@@ -16,6 +18,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +36,7 @@ public class PageServlet extends HttpServlet {
 	private transient MediaService mediaService;
 	private transient AdminService adminService;
 	private transient FollowService followService;
+	private transient CommentService commentService;
 
 	@Override
 	public void init() throws ServletException {
@@ -42,6 +46,7 @@ public class PageServlet extends HttpServlet {
 		this.mediaService = components.mediaService();
 		this.adminService = components.adminService();
 		this.followService = components.followService();
+		this.commentService = components.commentService();
 	}
 
 	@Override
@@ -167,26 +172,69 @@ public class PageServlet extends HttpServlet {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "user not found");
 			return;
 		}
-		List<Post> posts = postService.getByUser(userId, 0, 10);
-		
+
+		String tab = req.getParameter("tab");
+		if (tab == null || tab.isEmpty()) {
+			tab = "posts";
+		}
+
 		long viewerId = getSessionUserId(req);
-		if (viewerId > 0) {
-			posts.forEach(p -> p.setLiked(postService.isLiked(p.getId(), viewerId)));
+		
+		if ("likes".equals(tab)) {
+			List<Post> posts = postService.getLikedPosts(userId, 0, 20);
+			req.setAttribute("profilePosts", buildPostView(posts, viewerId));
+		} else if ("replies".equals(tab)) {
+			List<Comment> comments = commentService.getUserReplies(userId, 0, 20);
+			req.setAttribute("profileReplies", buildReplyViewWithStats(comments, viewerId));
+		} else {
+			// Default: posts
+			List<Post> posts = postService.getByUser(userId, 0, 20);
+			req.setAttribute("profilePosts", buildPostView(posts, viewerId));
 		}
 
 		Map<String, Object> stats = new HashMap<>();
-		stats.put("postCount", posts.size());
+		// stats.put("postCount", posts.size()); // Removed as it depends on tab
 		stats.put("followerCount", followService.countFollowers(userId));
 		stats.put("followingCount", followService.countFollowing(userId));
 		
 		boolean isOwner = viewerId > 0 && viewerId == userId;
 		boolean isFollowing = !isOwner && viewerId > 0 && followService.isFollowing(viewerId, userId);
 		req.setAttribute("profileUser", profileUser.get());
-		req.setAttribute("profilePosts", posts);
 		req.setAttribute("profileStats", stats);
+		req.setAttribute("currentTab", tab);
 		req.setAttribute("isOwner", isOwner);
 		req.setAttribute("isFollowing", isFollowing);
 		forward(req, resp, "/WEB-INF/jsp/profile.jsp");
+	}
+
+	private List<Map<String, Object>> buildReplyViewWithStats(List<Comment> comments, long viewerId) {
+		return comments.stream().map(comment -> {
+			Map<String, Object> view = new HashMap<>();
+			view.put("id", comment.getId());
+			view.put("content", comment.getContent());
+			view.put("createdAt", comment.getCreatedAt());
+
+			// Parent Post Info
+			Optional<Post> postOpt = postService.findById(comment.getPostId());
+			if (postOpt.isPresent()) {
+				Post post = postOpt.get();
+				view.put("postId", post.getId());
+				view.put("postContent", post.getContentText());
+				view.put("postMediaMetaJson", post.getMediaMetaJson());
+				view.put("postLikeCount", post.getLikeCount());
+				view.put("postCommentCount", post.getCommentCount());
+				view.put("postLiked", viewerId > 0 && postService.isLiked(post.getId(), viewerId));
+				view.put("postCreatedAt", post.getCreatedAt());
+
+				// Post Author Info
+				Optional<User> authorOpt = userService.findById(post.getUserId());
+				view.put("postAuthorId", post.getUserId());
+				view.put("postAuthorUsername", authorOpt.map(User::getUsername).orElse("unknown"));
+				view.put("postAuthorDisplayName", authorOpt.map(User::getDisplayName).orElse("Unknown"));
+				view.put("postAuthorAvatar", authorOpt.map(User::getAvatarPath).orElse(null));
+			}
+			return view;
+		}).collect(Collectors.toList());
 	}
 
 	private void handleProfileEdit(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
@@ -327,6 +375,7 @@ public class PageServlet extends HttpServlet {
 		return posts.stream().map(post -> {
 			Map<String, Object> view = new HashMap<>();
 			view.put("id", post.getId());
+			view.put("userId", post.getUserId());
 			view.put("contentText", post.getContentText());
 			view.put("likeCount", post.getLikeCount());
 			view.put("commentCount", post.getCommentCount());

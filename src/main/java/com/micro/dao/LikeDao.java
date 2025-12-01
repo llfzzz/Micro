@@ -6,4 +6,6 @@ public interface LikeDao {
     boolean removeLike(long postId, long userId);
 
     boolean exists(long postId, long userId);
+
+    java.util.List<Long> getLikedPostIds(long userId, int offset, int limit);
 }

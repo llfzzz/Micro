@@ -69,6 +69,26 @@ public class CommentDaoImpl extends BaseDao implements CommentDao {
     }
 
     @Override
+    public List<Comment> listByUser(long userId, int offset, int limit) {
+        String sql = BASE_SELECT + " WHERE user_id=? AND is_deleted=0 ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            ps.setInt(2, limit);
+            ps.setInt(3, offset);
+            try (ResultSet rs = ps.executeQuery()) {
+                List<Comment> comments = new ArrayList<>();
+                while (rs.next()) {
+                    comments.add(mapComment(rs));
+                }
+                return comments;
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Unable to list user comments", e);
+        }
+    }
+
+    @Override
     public boolean softDelete(long commentId, long operatorId) {
         String sql = "UPDATE comments SET is_deleted=1 WHERE id=?";
         try (Connection connection = getConnection();

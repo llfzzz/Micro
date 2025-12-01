@@ -1,14 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
     const postsContainer = document.getElementById('profile-posts');
+    const repliesContainer = document.getElementById('profile-replies');
+    const mainContainer = postsContainer || repliesContainer;
+    
     const followBtn = document.getElementById('follow-btn');
-    if (!postsContainer) {
+    
+    // If neither container exists, we might not be on a valid profile page part, 
+    // but we should still try to run other logic if possible, or just return if critical data is missing.
+    if (!mainContainer && !followBtn) {
         return;
     }
+
     const followText = followBtn?.querySelector('[data-follow-text]');
     const followersStat = document.getElementById('stat-followers');
     const followingStat = document.getElementById('stat-following');
-    const userId = postsContainer.dataset.userId;
-    const fallbackUsername = postsContainer.dataset.username || 'user';
+    
+    // Get userId from container or fallback to follow button
+    const userId = mainContainer ? mainContainer.dataset.userId : followBtn?.dataset.userId;
+    const fallbackUsername = mainContainer ? mainContainer.dataset.username : 'user';
 
     // Cleanup legacy "View Detail" links if they exist
     document.querySelectorAll('.feed-card .link').forEach(link => {
@@ -37,52 +46,59 @@ document.addEventListener('DOMContentLoaded', () => {
         return safe;
     }
 
-    document.querySelectorAll('.feed-card').forEach(card => {
-        const textContainer = card.querySelector('.content-text');
+    // 1. Text Folding
+    document.querySelectorAll('.feed-card, .thread-parent').forEach(card => {
+        const textContainer = card.querySelector('.content-text') || card.querySelector('.post-text-container');
         if (!textContainer) return;
-        const fullText = textContainer.dataset.fullText || '';
-        const mediaContainer = card.querySelector('.post-media-container');
-        const mediaJson = mediaContainer ? mediaContainer.dataset.media : '[]';
+        // If it's .post-text-container, it might not have data-full-text if it wasn't set up that way.
+        // In profile.jsp for replies, we used ${fn:escapeXml(reply.postContent)} directly inside div.
+        // So we might need to grab innerText if data-full-text is missing, but be careful about already folded text.
+        // However, for the reply parent post, we didn't implement folding structure in JSP yet.
+        // Let's just handle the click for navigation for now.
         
-        // 1. Text Folding
-        const LIMIT = 30;
-        if (fullText.length > LIMIT) {
-            const truncated = fullText.substring(0, LIMIT);
-            textContainer.innerHTML = `${formatText(truncated)}... <button class="expand-btn">展开</button>`;
-            
-            card.addEventListener('click', (e) => {
-                if (e.target.classList.contains('expand-btn')) {
-                    e.stopPropagation();
-                    textContainer.innerHTML = `${formatText(fullText)} <button class="collapse-btn">收起</button>`;
-                } else if (e.target.classList.contains('collapse-btn')) {
-                    e.stopPropagation();
-                    textContainer.innerHTML = `${formatText(truncated)}... <button class="expand-btn">展开</button>`;
-                } else if (e.target.tagName === 'A' || e.target.closest('a') || e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.closest('.carousel-prev') || e.target.closest('.carousel-next')) {
-                    return;
-                } else {
-                    const postId = card.dataset.postId;
-                    if (postId) {
-                        window.location.href = `${window.APP_CTX}/app/post?id=${postId}`;
-                    }
-                }
-            });
-        } else {
-            textContainer.innerHTML = formatText(fullText);
-            card.addEventListener('click', (e) => {
-                if (e.target.tagName === 'A' || e.target.closest('a') || e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.closest('.carousel-prev') || e.target.closest('.carousel-next')) {
-                    return;
-                }
-                const postId = card.dataset.postId;
-                if (postId) {
-                    window.location.href = `${window.APP_CTX}/app/post?id=${postId}`;
-                }
-            });
+        card.addEventListener('click', (e) => {
+            if (e.target.classList.contains('expand-btn') || e.target.classList.contains('collapse-btn')) {
+                return; // Handled by folding logic if present
+            }
+            if (e.target.tagName === 'A' || e.target.closest('a') || e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.closest('.carousel-prev') || e.target.closest('.carousel-next')) {
+                return;
+            }
+            const postId = card.dataset.postId;
+            if (postId) {
+                window.location.href = `${window.APP_CTX}/app/post?id=${postId}`;
+            }
+        });
+        
+        // Only apply folding logic if we have the structure
+        const contentTextSpan = card.querySelector('.content-text');
+        if (contentTextSpan) {
+             const fullText = contentTextSpan.dataset.fullText || '';
+             const LIMIT = 30;
+             if (fullText.length > LIMIT) {
+                 const truncated = fullText.substring(0, LIMIT);
+                 contentTextSpan.innerHTML = `${formatText(truncated)}... <button class="expand-btn">展开</button>`;
+                 
+                 card.addEventListener('click', (e) => {
+                     if (e.target.classList.contains('expand-btn')) {
+                         e.stopPropagation();
+                         contentTextSpan.innerHTML = `${formatText(fullText)} <button class="collapse-btn">收起</button>`;
+                     } else if (e.target.classList.contains('collapse-btn')) {
+                         e.stopPropagation();
+                         contentTextSpan.innerHTML = `${formatText(truncated)}... <button class="expand-btn">展开</button>`;
+                     }
+                 });
+             } else {
+                 contentTextSpan.innerHTML = formatText(fullText);
+             }
         }
-        
-        // 2. Media Rendering
+    });
+
+    // 2. Media Rendering
+    document.querySelectorAll('.post-media-container').forEach(mediaContainer => {
+        const mediaJson = mediaContainer.dataset.media;
         try {
             const mediaList = JSON.parse(mediaJson || '[]');
-            if (mediaList.length > 0 && mediaContainer) {
+            if (mediaList.length > 0) {
                 mediaContainer.style.display = 'block';
                 renderCarousel(mediaContainer, mediaList);
             }

@@ -9,5 +9,7 @@ public interface CommentService {
 
     List<Comment> getComments(long postId, int offset, int limit);
 
+    List<Comment> getUserReplies(long userId, int offset, int limit);
+
     boolean deleteComment(long commentId, long operatorId);
 }
