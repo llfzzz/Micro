@@ -93,4 +93,9 @@ public class PostServiceImpl implements PostService {
         List<Long> postIds = likeDao.getLikedPostIds(userId, offset, limit);
         return postDao.listByIds(postIds);
     }
+
+    @Override
+    public long countByUser(long userId) {
+        return postDao.countAdmin(userId, null, null, false);
+    }
 }

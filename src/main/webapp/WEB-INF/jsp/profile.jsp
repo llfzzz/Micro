@@ -30,6 +30,30 @@
     <main class="main">
         <c:choose>
             <c:when test="${not empty profileUser}">
+                <div class="profile-top-nav">
+                    <div class="nav-left">
+                        <a href="javascript:history.back()" class="nav-back-btn" aria-label="返回">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M20 11H7.414l4.293-4.293c.39-.39.39-1.023 0-1.414s-1.023-.39-1.414 0l-6 6c-.39.39-.39 1.023 0 1.414l6 6c.195.195.45.293.707.293s.512-.098.707-.293c.39-.39.39-1.023 0-1.414L7.414 13H20c.553 0 1-.447 1-1s-.447-1-1-1z"></path></g></svg>
+                        </a>
+                        <div class="nav-title">
+                            <h2>${profileUser.displayName != null ? profileUser.displayName : profileUser.username}</h2>
+                            <span class="nav-subtitle">${profileStats.postCount} 动态</span>
+                        </div>
+                    </div>
+                    <div class="nav-right">
+                        <div class="search-container">
+                            <form action="${ctx}/app/search" method="GET" class="profile-search-form">
+                                <input type="hidden" name="type" value="user_posts">
+                                <input type="hidden" name="uid" value="${profileUser.id}">
+                                <button type="button" class="nav-search-btn" aria-label="搜索">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>
+                                </button>
+                                <input type="text" name="q" class="profile-search-input" placeholder="搜索动态">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
                 <section class="card profile-header">
                     <div class="avatar-large" aria-hidden="true">
                         <c:if test="${not empty profileUser.avatarPath}">
@@ -41,10 +65,6 @@
                         <p class="muted">@${profileUser.username}</p>
                         <p>${profileUser.bio != null ? profileUser.bio : '这个人很神秘，什么都没有写。'}</p>
                         <div class="stats">
-                            <div>
-                                <span id="stat-posts">${profileStats.postCount != null ? profileStats.postCount : 0}</span>
-                                <small>帖子</small>
-                            </div>
                             <a class="stat-link" href="${ctx}/app/follows?type=followers&id=${profileUser.id}">
                                 <span id="stat-followers">${profileStats.followerCount != null ? profileStats.followerCount : 0}</span>
                                 <small>粉丝</small>

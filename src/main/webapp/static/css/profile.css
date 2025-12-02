@@ -212,3 +212,139 @@
     color: #536471;
     font-size: 15px;
 }
+
+/* Profile Top Nav */
+.profile-top-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    height: 53px;
+    position: sticky;
+    top: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    z-index: 1000;
+    border-bottom: 1px solid #eff3f4;
+    margin-bottom: 0;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+    min-width: 0;
+}
+
+.nav-back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: #0f1419;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+}
+.nav-back-btn:hover {
+    background-color: rgba(15, 20, 25, 0.1);
+}
+.nav-back-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.nav-title {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.nav-title h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 24px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #0f1419;
+}
+
+.nav-subtitle {
+    font-size: 13px;
+    color: #536471;
+    line-height: 16px;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.profile-search-form {
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border-radius: 9999px;
+    transition: background-color 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.profile-search-form.active {
+    background-color: #eff3f4;
+    border-color: #eff3f4;
+}
+
+.profile-search-input {
+    width: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    outline: none;
+    transition: width 0.3s ease, padding 0.3s ease;
+    opacity: 0;
+    font-size: 15px;
+    color: #0f1419;
+}
+
+.profile-search-form.active .profile-search-input {
+    width: 160px;
+    padding-right: 12px;
+    opacity: 1;
+}
+
+.nav-search-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #0f1419;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    padding: 0;
+}
+
+.nav-search-btn:hover {
+    background-color: rgba(15, 20, 25, 0.1);
+}
+
+.nav-search-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}

@@ -225,4 +225,43 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     refreshFollowSummary();
+
+    // Search Toggle Logic
+    const searchBtn = document.querySelector('.nav-search-btn');
+    const searchForm = document.querySelector('.profile-search-form');
+    const searchInput = document.querySelector('.profile-search-input');
+
+    if (searchBtn && searchForm && searchInput) {
+        searchBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (searchForm.classList.contains('active')) {
+                if (searchInput.value.trim() !== '') {
+                    searchForm.submit();
+                } else {
+                    searchForm.classList.remove('active');
+                    // Wait for transition to finish before hiding? 
+                    // Actually CSS handles opacity/width, so we don't need to set display:none manually if width is 0.
+                    // But to be safe for focus:
+                    searchInput.blur();
+                }
+            } else {
+                searchForm.classList.add('active');
+                searchInput.focus();
+            }
+        });
+
+        searchInput.addEventListener('blur', () => {
+            if (searchInput.value.trim() === '') {
+                searchForm.classList.remove('active');
+            }
+        });
+        
+        // Allow Enter key to submit
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchForm.submit();
+            }
+        });
+    }
 });
