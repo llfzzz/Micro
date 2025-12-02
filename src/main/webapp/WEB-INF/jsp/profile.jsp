@@ -66,7 +66,7 @@
                         <div class="profile-actions">
                             <c:choose>
                                 <c:when test="${not owner}">
-                                    <button id="follow-btn" class="btn ghost" data-user-id="${profileUser.id}" data-following="${followingState}">
+                                    <button id="follow-btn" class="btn ghost" data-user-id="${profileUser.id}" data-following="${followingState}" data-logged-in="${not empty sessionScope.userId}">
                                         <span data-follow-text>${followingState ? '已关注' : '关注'}</span>
                                     </button>
                                 </c:when>

@@ -208,6 +208,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!userId) {
             return;
         }
+        
+        if (followBtn.dataset.loggedIn === 'false') {
+            if (confirm('请先登录以关注用户。是否前往登录？')) {
+                window.location.href = `${window.APP_CTX}/app/login`;
+            }
+            return;
+        }
+
         followBtn.disabled = true;
         const isFollowing = followBtn.dataset.following === 'true';
         try {

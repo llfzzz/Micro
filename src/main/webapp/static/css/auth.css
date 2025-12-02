@@ -11,6 +11,27 @@
     border-radius: 12px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.06);
     width: min(420px, 90vw);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.auth-header {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.auth-action {
+    display: flex;
+    align-items: center;
+}
+
+.auth-card > p.muted:not(.swap-link) {
+    margin-top: 8px;
 }
 .auth-form {
     display: flex;
@@ -32,4 +53,23 @@
 .swap-link {
     text-align: center;
     margin-top: 16px;
+}
+
+
+
+.auth-close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    color: #0f1419;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.auth-close-btn:hover {
+    background-color: rgba(15, 20, 25, 0.1);
 }
