@@ -55,17 +55,13 @@
                 </div>
 
                 <div class="profile-banner">
-                    <c:if test="${not empty profileUser.bannerPath}">
-                        <img src="${ctx}/static/uploads/${profileUser.bannerPath}" alt="背景图" />
-                    </c:if>
+                    <img src="${ctx}/api/users/${profileUser.id}/banner" alt="背景图" onerror="this.style.display='none'" />
                 </div>
 
                 <section class="card profile-header">
                     <div class="profile-header-top">
                         <div class="avatar-large" aria-hidden="true">
-                            <c:if test="${not empty profileUser.avatarPath}">
-                                <img src="${ctx}/static/uploads/${profileUser.avatarPath}" alt="头像" />
-                            </c:if>
+                            <img src="${ctx}/api/users/${profileUser.id}/avatar" alt="头像" onerror="this.style.display='none'" />
                         </div>
                         <div class="profile-actions">
                             <c:choose>
@@ -121,9 +117,7 @@
                                         <div class="thread-parent" data-post-id="${reply.postId}" style="cursor: pointer;">
                                             <div class="feed-avatar-col">
                                                 <div class="avatar" aria-hidden="true">
-                                                    <c:if test="${not empty reply.postAuthorAvatar}">
-                                                        <img src="${ctx}/static/uploads/${reply.postAuthorAvatar}" class="post-avatar-img" data-userid="${reply.postAuthorId}" alt="头像" />
-                                                    </c:if>
+                                                    <img src="${ctx}/api/users/${reply.postAuthorId}/avatar" class="post-avatar-img" data-userid="${reply.postAuthorId}" alt="头像" onerror="this.style.display='none'" />
                                                 </div>
                                             </div>
                                             <div class="feed-content-col">
@@ -169,9 +163,7 @@
                                         <div class="thread-reply">
                                             <div class="feed-avatar-col">
                                                 <div class="avatar">
-                                                    <c:if test="${not empty profileUser.avatarPath}">
-                                                        <img src="${ctx}/static/uploads/${profileUser.avatarPath}" alt="头像" />
-                                                    </c:if>
+                                                    <img src="${ctx}/api/users/${profileUser.id}/avatar" alt="头像" onerror="this.style.display='none'" />
                                                 </div>
                                             </div>
                                             <div class="feed-content-col">
@@ -199,9 +191,7 @@
                                     <article class="card feed-card" data-post-id="${post.id}">
                                         <div class="feed-avatar-col">
                                             <div class="avatar" aria-hidden="true">
-                                                <c:if test="${not empty post.avatarPath}">
-                                                    <img src="${ctx}/static/uploads/${post.avatarPath}" class="post-avatar-img" data-userid="${post.userId}" alt="头像" />
-                                                </c:if>
+                                                <img src="${ctx}/api/users/${post.userId}/avatar" class="post-avatar-img" data-userid="${post.userId}" alt="头像" onerror="this.style.display='none'" />
                                             </div>
                                         </div>
                                         <div class="feed-content-col">

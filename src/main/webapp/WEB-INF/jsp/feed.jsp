@@ -43,9 +43,7 @@
                 <article class="card feed-card" data-post-id="${post.id}">
                     <div class="feed-avatar-col">
                         <div class="avatar" aria-hidden="true">
-                            <c:if test="${not empty post.avatarPath}">
-                                <img src="${ctx}/static/uploads/${post.avatarPath}" alt="头像" />
-                            </c:if>
+                            <img src="${ctx}/api/users/${post.userId}/avatar" alt="头像" onerror="this.style.display='none'" />
                         </div>
                     </div>
                     <div class="feed-content-col">
@@ -184,7 +182,7 @@
                         div.className = 'suggestion-item';
                         
                         if (type === '@') {
-                            const avatar = item.avatarPath ? `\${window.APP_CTX}/static/uploads/\${item.avatarPath}` : 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>';
+                            const avatar = `\${window.APP_CTX}/api/users/\${item.id}/avatar`;
                             div.innerHTML = `
                                 <img src="\${avatar}" onerror="this.style.display='none'">
                                 <div>

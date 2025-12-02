@@ -1,6 +1,7 @@
 package com.micro.dao;
 
 import com.micro.entity.User;
+import com.micro.entity.UserImage;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,14 @@ public interface UserDao {
     boolean setAvatar(long userId, String avatarPath);
 
     boolean setBanner(long userId, String bannerPath);
+
+    boolean updateAvatarData(long userId, byte[] data, String contentType);
+
+    boolean updateBannerData(long userId, byte[] data, String contentType);
+
+    Optional<UserImage> findAvatarData(long userId);
+
+    Optional<UserImage> findBannerData(long userId);
 
     List<User> list(int offset, int limit);
 

@@ -2,6 +2,7 @@ package com.micro.dao.impl;
 
 import com.micro.dao.UserDao;
 import com.micro.entity.User;
+import com.micro.entity.UserImage;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -22,6 +23,7 @@ public class UserDaoImpl extends BaseDao implements UserDao {
     public UserDaoImpl(DataSource dataSource) {
         super(dataSource);
     }
+
 
     @Override
     public Optional<User> findById(long id) {
@@ -141,6 +143,76 @@ public class UserDaoImpl extends BaseDao implements UserDao {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new IllegalStateException("Unable to set banner", e);
+        }
+    }
+
+    @Override
+    public boolean updateAvatarData(long userId, byte[] data, String contentType) {
+        String sql = "UPDATE users SET avatar_data=?, avatar_type=?, updated_at=CURRENT_TIMESTAMP WHERE id=?";
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setBytes(1, data);
+            ps.setString(2, contentType);
+            ps.setLong(3, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new IllegalStateException("Unable to update avatar data", e);
+        }
+    }
+
+    @Override
+    public boolean updateBannerData(long userId, byte[] data, String contentType) {
+        String sql = "UPDATE users SET banner_data=?, banner_type=?, updated_at=CURRENT_TIMESTAMP WHERE id=?";
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setBytes(1, data);
+            ps.setString(2, contentType);
+            ps.setLong(3, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new IllegalStateException("Unable to update banner data", e);
+        }
+    }
+
+    @Override
+    public Optional<UserImage> findAvatarData(long userId) {
+        String sql = "SELECT avatar_data, avatar_type FROM users WHERE id=?";
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    byte[] data = rs.getBytes("avatar_data");
+                    String type = rs.getString("avatar_type");
+                    if (data != null && data.length > 0) {
+                        return Optional.of(new UserImage(data, type));
+                    }
+                }
+                return Optional.empty();
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Unable to find avatar data", e);
+        }
+    }
+
+    @Override
+    public Optional<UserImage> findBannerData(long userId) {
+        String sql = "SELECT banner_data, banner_type FROM users WHERE id=?";
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    byte[] data = rs.getBytes("banner_data");
+                    String type = rs.getString("banner_type");
+                    if (data != null && data.length > 0) {
+                        return Optional.of(new UserImage(data, type));
+                    }
+                }
+                return Optional.empty();
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Unable to find banner data", e);
         }
     }
 

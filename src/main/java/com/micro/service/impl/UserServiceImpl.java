@@ -2,6 +2,7 @@ package com.micro.service.impl;
 
 import com.micro.dao.UserDao;
 import com.micro.entity.User;
+import com.micro.entity.UserImage;
 import com.micro.service.UserService;
 import com.micro.util.PasswordUtil;
 
@@ -46,9 +47,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean updateAvatarData(long userId, byte[] data, String contentType) {
+        return userDao.updateAvatarData(userId, data, contentType);
+    }
+
+    @Override
+    public boolean updateBannerData(long userId, byte[] data, String contentType) {
+        return userDao.updateBannerData(userId, data, contentType);
+    }
+
+    @Override
+    public Optional<UserImage> getAvatarData(long userId) {
+        return userDao.findAvatarData(userId);
+    }
+
+    @Override
+    public Optional<UserImage> getBannerData(long userId) {
+        return userDao.findBannerData(userId);
+    }
+
+    @Override
     public List<User> list(int offset, int limit) {
         return userDao.list(offset, limit);
     }
+
 
     @Override
     public boolean banUser(long userId, boolean banned) {

@@ -1,9 +1,9 @@
 package com.micro.servlet;
 
 import com.micro.entity.User;
+import com.micro.entity.UserImage;
 import com.micro.listener.AppContextListener;
 import com.micro.service.UserService;
-import com.micro.util.FileUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -11,14 +11,17 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @WebServlet(urlPatterns = "/api/users/*")
-@MultipartConfig
+@MultipartConfig(maxFileSize = 5 * 1024 * 1024) // 5MB
 public class UserServlet extends BaseServlet {
 
     private transient UserService userService;
@@ -35,6 +38,23 @@ public class UserServlet extends BaseServlet {
             handleSearch(req, resp);
             return;
         }
+        
+        // Check for /avatar or /banner suffix
+        if (path.endsWith("/avatar")) {
+            long userId = parseIdFromPath(path, "/avatar");
+            if (userId > 0) {
+                serveAvatar(req, resp, userId);
+                return;
+            }
+        }
+        if (path.endsWith("/banner")) {
+            long userId = parseIdFromPath(path, "/banner");
+            if (userId > 0) {
+                serveBanner(req, resp, userId);
+                return;
+            }
+        }
+
         long userId = parseId(req, resp);
         if (userId < 0) {
             return;
@@ -47,7 +67,65 @@ public class UserServlet extends BaseServlet {
         writeSuccess(resp, sanitize(user.get()));
     }
 
+    private long parseIdFromPath(String path, String suffix) {
+        try {
+            String idPart = path.substring(1, path.length() - suffix.length());
+            return Long.parseLong(idPart);
+        } catch (NumberFormatException | IndexOutOfBoundsException e) {
+            return -1;
+        }
+    }
+
+    private void serveAvatar(HttpServletRequest req, HttpServletResponse resp, long userId) throws IOException {
+        Optional<UserImage> image = userService.getAvatarData(userId);
+        if (image.isPresent()) {
+            resp.setContentType(image.get().getContentType());
+            resp.getOutputStream().write(image.get().getData());
+            return;
+        }
+        // Fallback to file if exists
+        Optional<User> user = userService.findById(userId);
+        if (user.isPresent() && user.get().getAvatarPath() != null) {
+            serveFile(resp, user.get().getAvatarPath());
+            return;
+        }
+        resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+    }
+
+    private void serveBanner(HttpServletRequest req, HttpServletResponse resp, long userId) throws IOException {
+        Optional<UserImage> image = userService.getBannerData(userId);
+        if (image.isPresent()) {
+            resp.setContentType(image.get().getContentType());
+            resp.getOutputStream().write(image.get().getData());
+            return;
+        }
+        // Fallback to file if exists
+        Optional<User> user = userService.findById(userId);
+        if (user.isPresent() && user.get().getBannerPath() != null) {
+            serveFile(resp, user.get().getBannerPath());
+            return;
+        }
+        resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+    }
+
+    private void serveFile(HttpServletResponse resp, String relativePath) throws IOException {
+        String storageRoot = AppContextListener.getFileStoragePath(getServletContext());
+        File file = new File(storageRoot, relativePath);
+        if (file.exists() && file.isFile()) {
+            String mimeType = getServletContext().getMimeType(file.getName());
+            if (mimeType == null) mimeType = "application/octet-stream";
+            resp.setContentType(mimeType);
+            try (FileInputStream in = new FileInputStream(file);
+                 OutputStream out = resp.getOutputStream()) {
+                in.transferTo(out);
+            }
+        } else {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
+
     private void handleSearch(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
         String query = req.getParameter("q");
         if (query == null || query.isBlank()) {
             writeSuccess(resp, List.of());
@@ -128,13 +206,14 @@ public class UserServlet extends BaseServlet {
             writeError(resp, HttpServletResponse.SC_BAD_REQUEST, 4006, "File required");
             return;
         }
-        String storageRoot = AppContextListener.getFileStoragePath(getServletContext());
-        String relativePath;
-        try (var stream = file.getInputStream()) {
-            relativePath = FileUtil.saveToStorage(stream, storageRoot, targetId, file.getSubmittedFileName());
-        }
-        userService.updateAvatar(targetId, relativePath);
-        Map<String, Object> payload = Map.of("avatarPath", relativePath);
+        
+        byte[] data = file.getInputStream().readAllBytes();
+        String contentType = file.getContentType();
+        
+        userService.updateAvatarData(targetId, data, contentType);
+        
+        // Return API URL
+        Map<String, Object> payload = Map.of("avatarPath", "/api/users/" + targetId + "/avatar");
         writeSuccess(resp, payload);
     }
 
@@ -156,13 +235,13 @@ public class UserServlet extends BaseServlet {
             writeError(resp, HttpServletResponse.SC_BAD_REQUEST, 4006, "File required");
             return;
         }
-        String storageRoot = AppContextListener.getFileStoragePath(getServletContext());
-        String relativePath;
-        try (var stream = file.getInputStream()) {
-            relativePath = FileUtil.saveToStorage(stream, storageRoot, targetId, file.getSubmittedFileName());
-        }
-        userService.updateBanner(targetId, relativePath);
-        Map<String, Object> payload = Map.of("bannerPath", relativePath);
+
+        byte[] data = file.getInputStream().readAllBytes();
+        String contentType = file.getContentType();
+
+        userService.updateBannerData(targetId, data, contentType);
+        
+        Map<String, Object> payload = Map.of("bannerPath", "/api/users/" + targetId + "/banner");
         writeSuccess(resp, payload);
     }
 

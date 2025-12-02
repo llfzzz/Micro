@@ -12,9 +12,13 @@
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
+        
+        const displayNameInput = form.querySelector('input[name="displayName"]');
+        const bioInput = form.querySelector('textarea[name="bio"]');
+        
         const payload = {
-            displayName: form.displayName.value.trim(),
-            bio: form.bio.value.trim()
+            displayName: displayNameInput ? displayNameInput.value.trim() : '',
+            bio: bioInput ? bioInput.value.trim() : ''
         };
         try {
             await window.apiPut(`/users/${userId}`, payload);
@@ -90,7 +94,9 @@
         avatarPreview.innerHTML = '';
         const img = document.createElement('img');
         img.alt = '头像';
-        img.src = `${window.APP_CTX || ''}/static/uploads/${path}`;
+        // Use API URL with timestamp to bust cache
+        img.src = `${window.APP_CTX || ''}/api/users/${userId}/avatar?t=${Date.now()}`;
+        img.className = 'edit-avatar-img';
         avatarPreview.appendChild(img);
     }
 
@@ -101,10 +107,9 @@
         bannerPreview.innerHTML = '';
         const img = document.createElement('img');
         img.alt = '背景图';
-        img.src = `${window.APP_CTX || ''}/static/uploads/${path}`;
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.objectFit = 'cover';
+        // Use API URL with timestamp to bust cache
+        img.src = `${window.APP_CTX || ''}/api/users/${userId}/banner?t=${Date.now()}`;
+        img.className = 'edit-banner-img';
         bannerPreview.appendChild(img);
     }
 
@@ -114,5 +119,9 @@
         }
         flash.textContent = message;
         flash.dataset.variant = variant;
+        flash.style.display = 'block';
+        setTimeout(() => {
+            flash.style.display = 'none';
+        }, 3000);
     }
 })();
