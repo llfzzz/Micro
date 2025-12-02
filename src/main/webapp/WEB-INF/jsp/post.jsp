@@ -24,9 +24,7 @@
         <article class="card feed-card">
             <div class="feed-avatar-col">
                 <div class="avatar" aria-hidden="true">
-                    <c:if test="${not empty post.avatarPath}">
-                        <img src="${ctx}/static/uploads/${post.avatarPath}" alt="头像" />
-                    </c:if>
+                    <img src="${ctx}/api/users/${post.userId}/avatar" alt="头像" onerror="this.style.display='none'" />
                 </div>
             </div>
             <div class="feed-content-col">
