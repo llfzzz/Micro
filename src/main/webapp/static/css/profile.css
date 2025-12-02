@@ -1,44 +1,118 @@
-.profile-header {
-    display: flex;
-    gap: 24px;
-    align-items: center;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-}
-.avatar-large {
-    width: 96px;
-    height: 96px;
-    border-radius: 50%;
-    background: #f4f4f4;
+.profile-banner {
+    width: 100%;
+    height: 200px;
+    background-color: #cfd9de;
     overflow: hidden;
 }
+.profile-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-header {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    padding-top: 12px;
+}
+
+.profile-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    height: 60px;
+    margin-bottom: 0;
+}
+
+.avatar-large {
+    width: 134px;
+    height: 134px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    margin-top: -80px;
+    background: #fff;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+}
+
 .avatar-large img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
-.stats {
-    display: flex;
-    gap: 32px;
-    margin: 12px 0;
+
+.profile-actions {
+    padding-top: 0;
 }
-.stats div {
+
+.profile-info {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 4px;
+}
+
+.profile-name {
+    font-weight: 800;
+    font-size: 20px;
+    margin: 0;
+    color: #0f1419;
+}
+
+.profile-username {
+    margin: 0;
+    color: #536471;
+    font-size: 15px;
+}
+
+.profile-bio {
+    margin-top: 12px;
+    margin-bottom: 12px;
+    color: #0f1419;
+    font-size: 15px;
+}
+
+.stats {
+    display: flex;
+    gap: 20px;
+    margin: 0;
+}
+
+.stats div {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
 }
 
 .stats .stat-link {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
+    align-items: baseline;
     text-decoration: none;
     color: inherit;
+    gap: 4px;
 }
 
 .stats .stat-link:hover {
-    color: var(--primary);
+    text-decoration: underline;
 }
+
+.stat-value {
+    font-weight: 700;
+    color: #0f1419;
+    font-size: 14px;
+}
+
+.stat-label {
+    color: #536471;
+    font-size: 14px;
+}
+
 .profile-meta ul {
     list-style: none;
     padding: 0;

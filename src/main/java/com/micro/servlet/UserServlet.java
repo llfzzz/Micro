@@ -103,6 +103,10 @@ public class UserServlet extends BaseServlet {
             handleAvatarUpload(req, resp);
             return;
         }
+        if (path != null && path.endsWith("/banner")) {
+            handleBannerUpload(req, resp);
+            return;
+        }
         writeError(resp, HttpServletResponse.SC_NOT_FOUND, 4041, "Unknown action");
     }
 
@@ -131,6 +135,34 @@ public class UserServlet extends BaseServlet {
         }
         userService.updateAvatar(targetId, relativePath);
         Map<String, Object> payload = Map.of("avatarPath", relativePath);
+        writeSuccess(resp, payload);
+    }
+
+    private void handleBannerUpload(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+        long sessionUser = requireSessionUser(req, resp);
+        if (sessionUser < 0) {
+            return;
+        }
+        long targetId = parseId(req, resp);
+        if (targetId < 0) {
+            return;
+        }
+        if (sessionUser != targetId) {
+            writeError(resp, HttpServletResponse.SC_FORBIDDEN, 4031, "Cannot change other banner");
+            return;
+        }
+        Part file = req.getPart("file");
+        if (file == null || file.getSize() == 0) {
+            writeError(resp, HttpServletResponse.SC_BAD_REQUEST, 4006, "File required");
+            return;
+        }
+        String storageRoot = AppContextListener.getFileStoragePath(getServletContext());
+        String relativePath;
+        try (var stream = file.getInputStream()) {
+            relativePath = FileUtil.saveToStorage(stream, storageRoot, targetId, file.getSubmittedFileName());
+        }
+        userService.updateBanner(targetId, relativePath);
+        Map<String, Object> payload = Map.of("bannerPath", relativePath);
         writeSuccess(resp, payload);
     }
 

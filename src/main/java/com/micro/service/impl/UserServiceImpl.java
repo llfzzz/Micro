@@ -41,6 +41,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean updateBanner(long userId, String bannerPath) {
+        return userDao.setBanner(userId, bannerPath);
+    }
+
+    @Override
     public List<User> list(int offset, int limit) {
         return userDao.list(offset, limit);
     }

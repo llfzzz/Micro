@@ -17,7 +17,7 @@ import java.util.Optional;
 
 public class UserDaoImpl extends BaseDao implements UserDao {
 
-    private static final String BASE_SELECT = "SELECT id, username, email, password_hash, display_name, bio, avatar_path, role, is_banned, created_at, updated_at FROM users";
+    private static final String BASE_SELECT = "SELECT id, username, email, password_hash, display_name, bio, avatar_path, banner_path, role, is_banned, created_at, updated_at FROM users";
 
     public UserDaoImpl(DataSource dataSource) {
         super(dataSource);
@@ -132,6 +132,19 @@ public class UserDaoImpl extends BaseDao implements UserDao {
     }
 
     @Override
+    public boolean setBanner(long userId, String bannerPath) {
+        String sql = "UPDATE users SET banner_path=?, updated_at=CURRENT_TIMESTAMP WHERE id=?";
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, bannerPath);
+            ps.setLong(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new IllegalStateException("Unable to set banner", e);
+        }
+    }
+
+    @Override
     public List<User> list(int offset, int limit) {
         String sql = BASE_SELECT + " ORDER BY created_at DESC LIMIT ? OFFSET ?";
         try (Connection connection = getConnection();
@@ -205,6 +218,7 @@ public class UserDaoImpl extends BaseDao implements UserDao {
         user.setDisplayName(rs.getString("display_name"));
         user.setBio(rs.getString("bio"));
         user.setAvatarPath(rs.getString("avatar_path"));
+        user.setBannerPath(rs.getString("banner_path"));
         user.setRole(rs.getString("role"));
         user.setBanned(rs.getBoolean("is_banned"));
         user.setCreatedAt(toLocalDateTime(rs.getTimestamp("created_at")));

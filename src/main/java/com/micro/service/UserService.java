@@ -14,6 +14,8 @@ public interface UserService {
 
     boolean updateAvatar(long userId, String avatarPath);
 
+    boolean updateBanner(long userId, String bannerPath);
+
     List<User> list(int offset, int limit);
 
     boolean banUser(long userId, boolean banned);

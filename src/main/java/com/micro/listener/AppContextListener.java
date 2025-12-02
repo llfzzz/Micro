@@ -27,6 +27,7 @@ import com.micro.service.impl.MediaServiceImpl;
 import com.micro.service.impl.PostServiceImpl;
 import com.micro.service.impl.UserServiceImpl;
 import com.micro.util.PropertyUtil;
+import com.micro.util.SchemaUpdater;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
@@ -67,6 +68,9 @@ public class AppContextListener implements ServletContextListener {
 
         this.dataSource = buildDataSource(properties);
         context.setAttribute(DATA_SOURCE_ATTR, dataSource);
+
+        // Ensure schema is up to date
+        SchemaUpdater.checkAndUpdate(dataSource);
 
         String storagePath = properties.getProperty("file.storage.path", System.getProperty("java.io.tmpdir") + "/micro/uploads");
         File storageDir = new File(storagePath).getAbsoluteFile();

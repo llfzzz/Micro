@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
     display_name VARCHAR(100),
     bio VARCHAR(500),
     avatar_path VARCHAR(255),
+    banner_path VARCHAR(255),
     role ENUM('USER','ADMIN') DEFAULT 'USER',
     is_banned TINYINT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

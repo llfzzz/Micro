@@ -24,6 +24,8 @@ public interface UserDao {
 
     boolean setAvatar(long userId, String avatarPath);
 
+    boolean setBanner(long userId, String bannerPath);
+
     List<User> list(int offset, int limit);
 
     boolean banUser(long userId, boolean banned);

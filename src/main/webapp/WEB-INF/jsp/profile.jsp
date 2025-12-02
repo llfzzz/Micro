@@ -32,7 +32,7 @@
             <c:when test="${not empty profileUser}">
                 <div class="profile-top-nav">
                     <div class="nav-left">
-                        <a href="javascript:history.back()" class="nav-back-btn" aria-label="返回">
+                        <a href="${ctx}/app/feed" class="nav-back-btn" aria-label="返回">
                             <svg viewBox="0 0 24 24" aria-hidden="true"><g><path d="M20 11H7.414l4.293-4.293c.39-.39.39-1.023 0-1.414s-1.023-.39-1.414 0l-6 6c-.39.39-.39 1.023 0 1.414l6 6c.195.195.45.293.707.293s.512-.098.707-.293c.39-.39.39-1.023 0-1.414L7.414 13H20c.553 0 1-.447 1-1s-.447-1-1-1z"></path></g></svg>
                         </a>
                         <div class="nav-title">
@@ -54,36 +54,48 @@
                     </div>
                 </div>
 
+                <div class="profile-banner">
+                    <c:if test="${not empty profileUser.bannerPath}">
+                        <img src="${ctx}/static/uploads/${profileUser.bannerPath}" alt="背景图" />
+                    </c:if>
+                </div>
+
                 <section class="card profile-header">
-                    <div class="avatar-large" aria-hidden="true">
-                        <c:if test="${not empty profileUser.avatarPath}">
-                            <img src="${ctx}/static/uploads/${profileUser.avatarPath}" alt="头像" />
-                        </c:if>
+                    <div class="profile-header-top">
+                        <div class="avatar-large" aria-hidden="true">
+                            <c:if test="${not empty profileUser.avatarPath}">
+                                <img src="${ctx}/static/uploads/${profileUser.avatarPath}" alt="头像" />
+                            </c:if>
+                        </div>
+                        <div class="profile-actions">
+                            <c:choose>
+                                <c:when test="${not owner}">
+                                    <button id="follow-btn" class="btn ghost" data-user-id="${profileUser.id}" data-following="${followingState}">
+                                        <span data-follow-text>${followingState ? '已关注' : '关注'}</span>
+                                    </button>
+                                </c:when>
+                                <c:otherwise>
+                                    <a href="${ctx}/app/profile/edit" class="btn ghost">编辑资料</a>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
                     </div>
-                    <div>
-                        <h2>${profileUser.displayName != null ? profileUser.displayName : profileUser.username}</h2>
-                        <p class="muted">@${profileUser.username}</p>
-                        <p>${profileUser.bio != null ? profileUser.bio : '这个人很神秘，什么都没有写。'}</p>
+                    
+                    <div class="profile-info">
+                        <h2 class="profile-name">${profileUser.displayName != null ? profileUser.displayName : profileUser.username}</h2>
+                        <p class="profile-username muted">@${profileUser.username}</p>
+                        <p class="profile-bio">${profileUser.bio != null ? profileUser.bio : '这个人很神秘，什么都没有写。'}</p>
+                        
                         <div class="stats">
-                            <a class="stat-link" href="${ctx}/app/follows?type=followers&id=${profileUser.id}">
-                                <span id="stat-followers">${profileStats.followerCount != null ? profileStats.followerCount : 0}</span>
-                                <small>粉丝</small>
-                            </a>
                             <a class="stat-link" href="${ctx}/app/follows?type=following&id=${profileUser.id}">
-                                <span id="stat-following">${profileStats.followingCount != null ? profileStats.followingCount : 0}</span>
-                                <small>关注</small>
+                                <span id="stat-following" class="stat-value">${profileStats.followingCount != null ? profileStats.followingCount : 0}</span>
+                                <span class="stat-label">关注</span>
+                            </a>
+                            <a class="stat-link" href="${ctx}/app/follows?type=followers&id=${profileUser.id}">
+                                <span id="stat-followers" class="stat-value">${profileStats.followerCount != null ? profileStats.followerCount : 0}</span>
+                                <span class="stat-label">粉丝</span>
                             </a>
                         </div>
-                        <c:choose>
-                            <c:when test="${not owner}">
-                                <button id="follow-btn" class="btn ghost" data-user-id="${profileUser.id}" data-following="${followingState}">
-                                    <span data-follow-text>${followingState ? '已关注' : '关注'}</span>
-                                </button>
-                            </c:when>
-                            <c:otherwise>
-                                <a href="${ctx}/app/profile/edit" class="btn ghost">编辑资料</a>
-                            </c:otherwise>
-                        </c:choose>
                     </div>
                 </section>
                 <section class="card no-padding">

@@ -10,6 +10,7 @@ public class User {
     private String displayName;
     private String bio;
     private String avatarPath;
+    private String bannerPath;
     private String role;
     private boolean banned;
     private LocalDateTime createdAt;
@@ -69,6 +70,14 @@ public class User {
 
     public void setAvatarPath(String avatarPath) {
         this.avatarPath = avatarPath;
+    }
+
+    public String getBannerPath() {
+        return bannerPath;
+    }
+
+    public void setBannerPath(String bannerPath) {
+        this.bannerPath = bannerPath;
     }
 
     public String getRole() {

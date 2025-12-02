@@ -42,11 +42,6 @@
                            <input type="text" id="displayName" name="displayName" maxlength="100"
                                value="${fn:escapeXml(profile.displayName != null ? profile.displayName : '')}" placeholder="昵称" />
                     </div>
-                    <div>
-                        <label for="email">邮箱</label>
-                           <input type="email" id="email" name="email" maxlength="100"
-                               value="${fn:escapeXml(profile.email != null ? profile.email : '')}" placeholder="name@example.com" />
-                    </div>
                 </div>
                 <div class="form-row">
                     <label for="bio">简介</label>
@@ -62,6 +57,18 @@
                     <div>
                         <label for="avatarInput">头像</label>
                         <input type="file" id="avatarInput" accept="image/*" />
+                        <p class="muted small">选择图片后自动上传。</p>
+                    </div>
+                </div>
+                <div class="avatar-upload">
+                    <div class="banner-preview" id="banner-preview" style="width: 100%; height: 100px; background: #f4f4f4; overflow: hidden; border-radius: 8px;">
+                        <c:if test="${not empty profile.bannerPath}">
+                            <img src="${ctx}/static/uploads/${profile.bannerPath}" alt="当前背景" style="width: 100%; height: 100%; object-fit: cover;" />
+                        </c:if>
+                    </div>
+                    <div>
+                        <label for="bannerInput">背景图</label>
+                        <input type="file" id="bannerInput" accept="image/*" />
                         <p class="muted small">选择图片后自动上传。</p>
                     </div>
                 </div>
