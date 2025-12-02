@@ -116,14 +116,18 @@
                                         <!-- Parent Post Context -->
                                         <div class="thread-parent" data-post-id="${reply.postId}" style="cursor: pointer;">
                                             <div class="feed-avatar-col">
-                                                <div class="avatar" aria-hidden="true">
-                                                    <img src="${ctx}/api/users/${reply.postAuthorId}/avatar" class="post-avatar-img" data-userid="${reply.postAuthorId}" alt="头像" onerror="this.style.display='none'" />
-                                                </div>
+                                                <a href="${ctx}/app/profile?id=${reply.postAuthorId}" class="avatar-link" onclick="event.stopPropagation()">
+                                                    <div class="avatar" aria-hidden="true">
+                                                        <img src="${ctx}/api/users/${reply.postAuthorId}/avatar" class="post-avatar-img" data-userid="${reply.postAuthorId}" alt="头像" onerror="this.style.display='none'" />
+                                                    </div>
+                                                </a>
                                             </div>
                                             <div class="feed-content-col">
                                                 <div class="post-header">
-                                                    <span class="display-name" data-userid="${reply.postAuthorId}">${reply.postAuthorDisplayName != null ? reply.postAuthorDisplayName : reply.postAuthorUsername}</span>
-                                                    <span class="username">@${reply.postAuthorUsername}</span>
+                                                    <a href="${ctx}/app/profile?id=${reply.postAuthorId}" class="profile-link" onclick="event.stopPropagation()">
+                                                        <span class="display-name" data-userid="${reply.postAuthorId}">${reply.postAuthorDisplayName != null ? reply.postAuthorDisplayName : reply.postAuthorUsername}</span>
+                                                        <span class="username">@${reply.postAuthorUsername}</span>
+                                                    </a>
                                                     <span class="time-line">${fn:replace(reply.postCreatedAt,'T',' ')}</span>
                                                 </div>
                                                 
@@ -190,14 +194,18 @@
                                 <c:forEach var="post" items="${profilePosts}">
                                     <article class="card feed-card" data-post-id="${post.id}">
                                         <div class="feed-avatar-col">
-                                            <div class="avatar" aria-hidden="true">
-                                                <img src="${ctx}/api/users/${post.userId}/avatar" class="post-avatar-img" data-userid="${post.userId}" alt="头像" onerror="this.style.display='none'" />
-                                            </div>
+                                            <a href="${ctx}/app/profile?id=${post.userId}" class="avatar-link" onclick="event.stopPropagation()">
+                                                <div class="avatar" aria-hidden="true">
+                                                    <img src="${ctx}/api/users/${post.userId}/avatar" class="post-avatar-img" data-userid="${post.userId}" alt="头像" onerror="this.style.display='none'" />
+                                                </div>
+                                            </a>
                                         </div>
                                         <div class="feed-content-col">
                                             <div class="post-header">
-                                                <span class="display-name" data-userid="${post.userId}">${post.displayName != null ? post.displayName : post.username}</span>
-                                                <span class="username">@${post.username}</span>
+                                                <a href="${ctx}/app/profile?id=${post.userId}" class="profile-link" onclick="event.stopPropagation()">
+                                                    <span class="display-name" data-userid="${post.userId}">${post.displayName != null ? post.displayName : post.username}</span>
+                                                    <span class="username">@${post.username}</span>
+                                                </a>
                                                 <span class="time-line">${fn:replace(post.createdAt,'T',' ')}</span>
                                             </div>
                                             

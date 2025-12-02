@@ -444,3 +444,24 @@
     border-radius: 10px;
     font-size: 12px;
 }
+
+/* Profile Links */
+.avatar-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.profile-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.profile-link:hover .display-name {
+    text-decoration: underline;
+}

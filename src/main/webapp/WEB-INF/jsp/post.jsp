@@ -23,14 +23,18 @@
         </div>
         <article class="card feed-card">
             <div class="feed-avatar-col">
-                <div class="avatar" aria-hidden="true">
-                    <img src="${ctx}/api/users/${post.userId}/avatar" alt="头像" onerror="this.style.display='none'" />
-                </div>
+                <a href="${ctx}/app/profile?id=${post.userId}" class="avatar-link">
+                    <div class="avatar" aria-hidden="true">
+                        <img src="${ctx}/api/users/${post.userId}/avatar" alt="头像" onerror="this.style.display='none'" />
+                    </div>
+                </a>
             </div>
             <div class="feed-content-col">
                 <div class="post-header">
-                    <span class="display-name">${post.displayName != null ? post.displayName : post.username}</span>
-                    <span class="username">@${post.username}</span>
+                    <a href="${ctx}/app/profile?id=${post.userId}" class="profile-link">
+                        <span class="display-name">${post.displayName != null ? post.displayName : post.username}</span>
+                        <span class="username">@${post.username}</span>
+                    </a>
                     <span class="time-line">发布于 ${fn:replace(post.createdAt,'T',' ')}</span>
                 </div>
                 

@@ -184,14 +184,18 @@ document.addEventListener('DOMContentLoaded', () => {
             
             card.innerHTML = `
                 <div class="feed-avatar-col">
-                    <div class="avatar">
-                        ${item.avatarPath ? `<img src="${window.APP_CTX}/static/uploads/${item.avatarPath}" alt="头像">` : ''}
-                    </div>
+                    <a href="${window.APP_CTX}/app/profile?id=${item.userId}" class="avatar-link" onclick="event.stopPropagation()">
+                        <div class="avatar">
+                            <img src="${window.APP_CTX}/api/users/${item.userId}/avatar" alt="头像" onerror="this.style.display='none'">
+                        </div>
+                    </a>
                 </div>
                 <div class="feed-content-col">
                     <div class="post-header">
-                        <span class="display-name">${item.displayName || item.username || 'anonymous'}</span>
-                        <span class="username">@${item.username || 'anonymous'}</span>
+                        <a href="${window.APP_CTX}/app/profile?id=${item.userId}" class="profile-link" onclick="event.stopPropagation()">
+                            <span class="display-name">${item.displayName || item.username || 'anonymous'}</span>
+                            <span class="username">@${item.username || 'anonymous'}</span>
+                        </a>
                         <span class="time-line">${new Date(item.createdAt || Date.now()).toLocaleString().replace(/\//g, '-').replace('T', ' ')}</span>
                     </div>
                     

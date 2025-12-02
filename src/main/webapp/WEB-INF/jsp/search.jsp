@@ -34,12 +34,14 @@
                 <c:forEach var="user" items="${userList}">
                     <div class="card profile-header small">
                         <div class="avatar-large" style="width: 48px; height: 48px;">
-                            <c:if test="${not empty user.avatarPath}">
-                                <img src="${ctx}/static/uploads/${user.avatarPath}" alt="头像" />
-                            </c:if>
+                            <a href="${ctx}/app/profile?id=${user.id}" class="avatar-link">
+                                <img src="${ctx}/api/users/${user.id}/avatar" alt="头像" onerror="this.style.display='none'" />
+                            </a>
                         </div>
                         <div>
-                            <strong>${user.displayName != null ? user.displayName : user.username}</strong>
+                            <a href="${ctx}/app/profile?id=${user.id}" class="profile-link">
+                                <strong>${user.displayName != null ? user.displayName : user.username}</strong>
+                            </a>
                             <p class="muted">@${user.username}</p>
                             <a href="${ctx}/app/profile?id=${user.id}" class="btn ghost small">查看</a>
                         </div>
@@ -54,18 +56,20 @@
         <c:if test="${searchType == 'posts'}">
             <section id="feed-list">
                 <c:forEach var="post" items="${feedList}">
-                    <article class="card feed-card" onclick="window.location.href='${ctx}/app/post?id=${post.id}'" style="cursor:pointer">
+                    <article class="card feed-card" data-post-id="${post.id}">
                         <div class="feed-avatar-col">
-                            <div class="avatar" aria-hidden="true">
-                                <c:if test="${not empty post.avatarPath}">
-                                    <img src="${ctx}/static/uploads/${post.avatarPath}" alt="头像" />
-                                </c:if>
-                            </div>
+                            <a href="${ctx}/app/profile?id=${post.userId}" class="avatar-link" onclick="event.stopPropagation()">
+                                <div class="avatar" aria-hidden="true">
+                                    <img src="${ctx}/api/users/${post.userId}/avatar" alt="头像" onerror="this.style.display='none'" />
+                                </div>
+                            </a>
                         </div>
                         <div class="feed-content-col">
                             <div class="post-header">
-                                <span class="display-name">${post.displayName != null ? post.displayName : post.username}</span>
-                                <span class="username">@${post.username}</span>
+                                <a href="${ctx}/app/profile?id=${post.userId}" class="profile-link" onclick="event.stopPropagation()">
+                                    <span class="display-name">${post.displayName != null ? post.displayName : post.username}</span>
+                                    <span class="username">@${post.username}</span>
+                                </a>
                                 <span class="time-line">${fn:replace(post.createdAt,'T',' ')}</span>
                             </div>
                             
