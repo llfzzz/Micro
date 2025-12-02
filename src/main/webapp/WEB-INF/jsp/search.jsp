@@ -19,7 +19,14 @@
     </aside>
     <main class="main">
         <div class="card">
-            <h2>搜索：${searchQuery}</h2>
+            <c:choose>
+                <c:when test="${not empty searchTargetUser}">
+                    <h2>在 @${searchTargetUser.username} 的动态中搜索：${searchQuery}</h2>
+                </c:when>
+                <c:otherwise>
+                    <h2>搜索：${searchQuery}</h2>
+                </c:otherwise>
+            </c:choose>
         </div>
 
         <c:if test="${searchType == 'users'}">

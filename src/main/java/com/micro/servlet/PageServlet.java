@@ -316,6 +316,23 @@ public class PageServlet extends HttpServlet {
 		query = query.trim();
 		req.setAttribute("searchQuery", query);
 
+		String type = req.getParameter("type");
+		if ("user_posts".equals(type)) {
+			long uid = parseLong(req.getParameter("uid"));
+			if (uid > 0) {
+				List<Post> posts = postService.searchByUser(uid, query, 0, 20);
+				req.setAttribute("searchType", "posts");
+				long viewerId = getSessionUserId(req);
+				req.setAttribute("feedList", buildPostView(posts, viewerId));
+
+				Optional<User> targetUser = userService.findById(uid);
+				targetUser.ifPresent(user -> req.setAttribute("searchTargetUser", user));
+
+				forward(req, resp, "/WEB-INF/jsp/search.jsp");
+				return;
+			}
+		}
+
 		if (query.startsWith("@")) {
 			// Search users
 			String keyword = query.substring(1);

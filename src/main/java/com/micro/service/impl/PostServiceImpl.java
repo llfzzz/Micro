@@ -70,6 +70,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public List<Post> searchByUser(long userId, String keyword, int offset, int limit) {
+        return postDao.adminSearch(userId, keyword, null, false, offset, limit);
+    }
+
+    @Override
     public List<String> searchTags(String query, int limit) {
         // Fetch posts that might contain the tag
         List<String> contents = postDao.listContentWithTag(query, 100);

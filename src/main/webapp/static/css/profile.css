@@ -2,6 +2,8 @@
     display: flex;
     gap: 24px;
     align-items: center;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
 .avatar-large {
     width: 96px;
@@ -49,7 +51,7 @@
 }
 #profile-posts .feed-card {
     border-bottom: 1px solid #eee;
-    padding: 16px 0;
+    padding: 16px 16px;
 }
 #profile-posts .feed-card:last-child {
     border-bottom: none;
