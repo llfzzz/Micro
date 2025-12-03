@@ -23,8 +23,33 @@
 }
 
 .comment-item {
-    padding: 12px 0;
+    padding: 16px 0;
     border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 12px;
+}
+
+.comment-avatar {
+    flex: 0 0 40px;
+}
+
+.comment-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.comment-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.comment-text {
+    color: #0f1419;
+    font-size: 15px;
+    line-height: 1.5;
+    word-break: break-word;
 }
 
 /* Detail Page Media Overrides */

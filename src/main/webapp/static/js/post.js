@@ -5,17 +5,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.refreshComments = async function() {
         if (!postId) return;
-        const data = await window.apiGet(`/comments?postId=${postId}`);
-        commentList.innerHTML = '';
-        (data.items || []).forEach((item) => {
-            const el = document.createElement('div');
-            el.className = 'comment-item';
-            el.innerHTML = `
-                <strong>@${item.username || 'user'}</strong>
-                <p>${item.content}</p>
-            `;
-            commentList.appendChild(el);
-        });
+        try {
+            const data = await window.apiGet(`/comments?postId=${postId}`);
+            commentList.innerHTML = '';
+            (data.items || []).forEach((item) => {
+                const el = document.createElement('div');
+                el.className = 'comment-item';
+                // Force flex layout inline to ensure it works even if CSS is cached or missing
+                el.style.display = 'flex';
+                el.style.gap = '12px';
+                
+                const avatarUrl = `${window.APP_CTX}/api/users/${item.userId}/avatar`;
+                const profileUrl = `${window.APP_CTX}/app/profile?id=${item.userId}`;
+                const timeStr = new Date(item.createdAt).toLocaleString().replace(/\//g, '-').replace('T', ' ');
+                const displayName = item.displayName || item.username || 'user';
+                const username = item.username || 'user';
+
+                el.innerHTML = `
+                    <div class="feed-avatar-col">
+                        <a href="${profileUrl}" class="avatar-link">
+                            <div class="avatar">
+                                <img src="${avatarUrl}" alt="avatar" onerror="this.style.display='none'">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="comment-content">
+                        <div class="post-header" style="margin-bottom: 2px;">
+                            <a href="${profileUrl}" class="profile-link">
+                                <span class="display-name">${displayName}</span>
+                                <span class="username">@${username}</span>
+                            </a>
+                            <span class="time-line">${timeStr}</span>
+                        </div>
+                        <div class="comment-text">${formatText(item.content)}</div>
+                    </div>
+                `;
+                commentList.appendChild(el);
+            });
+        } catch (err) {
+            console.error('Failed to load comments', err);
+        }
+    }
+
+    function formatText(text) {
+        if (!text) return '';
+        return text.replace(/&/g, "&amp;")
+                   .replace(/</g, "&lt;")
+                   .replace(/>/g, "&gt;")
+                   .replace(/"/g, "&quot;")
+                   .replace(/'/g, "&#039;");
     }
 
     if (commentForm) {

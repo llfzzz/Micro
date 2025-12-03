@@ -11,6 +11,10 @@ public class Comment {
     private boolean deleted;
     private LocalDateTime createdAt;
 
+    // Transient fields for display
+    private String username;
+    private String displayName;
+
     public long getId() {
         return id;
     }
@@ -65,5 +69,21 @@ public class Comment {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 }

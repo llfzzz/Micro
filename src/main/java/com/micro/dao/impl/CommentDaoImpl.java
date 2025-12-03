@@ -50,7 +50,10 @@ public class CommentDaoImpl extends BaseDao implements CommentDao {
 
     @Override
     public List<Comment> listByPost(long postId, int offset, int limit) {
-        String sql = BASE_SELECT + " WHERE post_id=? AND is_deleted=0 ORDER BY created_at ASC LIMIT ? OFFSET ?";
+        String sql = "SELECT c.*, u.username, u.display_name FROM comments c " +
+                     "JOIN users u ON c.user_id = u.id " +
+                     "WHERE c.post_id=? AND c.is_deleted=0 " +
+                     "ORDER BY c.created_at ASC LIMIT ? OFFSET ?";
         try (Connection connection = getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, postId);
@@ -59,7 +62,7 @@ public class CommentDaoImpl extends BaseDao implements CommentDao {
             try (ResultSet rs = ps.executeQuery()) {
                 List<Comment> comments = new ArrayList<>();
                 while (rs.next()) {
-                    comments.add(mapComment(rs));
+                    comments.add(mapCommentWithUser(rs));
                 }
                 return comments;
             }
@@ -70,7 +73,10 @@ public class CommentDaoImpl extends BaseDao implements CommentDao {
 
     @Override
     public List<Comment> listByUser(long userId, int offset, int limit) {
-        String sql = BASE_SELECT + " WHERE user_id=? AND is_deleted=0 ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        String sql = "SELECT c.*, u.username, u.display_name FROM comments c " +
+                     "JOIN users u ON c.user_id = u.id " +
+                     "WHERE c.user_id=? AND c.is_deleted=0 " +
+                     "ORDER BY c.created_at DESC LIMIT ? OFFSET ?";
         try (Connection connection = getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, userId);
@@ -79,7 +85,7 @@ public class CommentDaoImpl extends BaseDao implements CommentDao {
             try (ResultSet rs = ps.executeQuery()) {
                 List<Comment> comments = new ArrayList<>();
                 while (rs.next()) {
-                    comments.add(mapComment(rs));
+                    comments.add(mapCommentWithUser(rs));
                 }
                 return comments;
             }
@@ -110,6 +116,13 @@ public class CommentDaoImpl extends BaseDao implements CommentDao {
         } catch (SQLException e) {
             throw new IllegalStateException("Unable to count comments", e);
         }
+    }
+
+    private Comment mapCommentWithUser(ResultSet rs) throws SQLException {
+        Comment comment = mapComment(rs);
+        comment.setUsername(rs.getString("username"));
+        comment.setDisplayName(rs.getString("display_name"));
+        return comment;
     }
 
     private Comment mapComment(ResultSet rs) throws SQLException {

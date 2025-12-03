@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class PostDaoImpl extends BaseDao implements PostDao {
+public class  PostDaoImpl extends BaseDao implements PostDao {
 
     private static final String BASE_SELECT = "SELECT id, user_id, content_text, media_meta, link_url, visibility, like_count, comment_count, forward_count, is_deleted, created_at, updated_at FROM posts";
 

@@ -6,48 +6,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let loading = false;
     let finished = false;
 
-    async function loadMore() {
-        if (loading || finished) return;
-        loading = true;
-        try {
-            const params = new URLSearchParams({ offset, limit, feed: 'true' });
-            const data = await window.apiGet(`/posts?${params}`);
-            renderFeed(data.items || []);
-            offset += limit;
-            if (!data.items || data.items.length < limit) {
-                finished = true;
-                sentinel.textContent = '没有更多了';
-            }
-        } catch (err) {
-            sentinel.textContent = err.message;
-        } finally {
-            loading = false;
-        }
-    }
-
-    // Cleanup legacy "View Detail" links if they exist
-    document.querySelectorAll('.feed-card .link').forEach(link => {
-        if (link.textContent.includes('查看详情')) {
-            link.remove();
-        }
-    });
-
-    // --- Feed Display Logic (New) ---
+    // --- Shared Utilities ---
     function formatText(text) {
         if (!text) return '';
-        // Escape HTML
         let safe = text.replace(/&/g, "&amp;")
                        .replace(/</g, "&lt;")
                        .replace(/>/g, "&gt;")
                        .replace(/"/g, "&quot;")
                        .replace(/'/g, "&#039;");
         
-        // Linkify #hashtags
         safe = safe.replace(/#([^#\s@]+)/g, (match, tag) => {
             return `<a href="${window.APP_CTX}/app/search?q=%23${encodeURIComponent(tag)}" class="link-tag">${match}</a>`;
         });
 
-        // Linkify @mentions
         safe = safe.replace(/@([^#\s@]+)/g, (match, user) => {
             return `<a href="${window.APP_CTX}/app/search?q=@${encodeURIComponent(user)}" class="link-mention">${match}</a>`;
         });
@@ -55,60 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return safe;
     }
 
-    document.querySelectorAll('.feed-card').forEach(card => {
-        const textContainer = card.querySelector('.content-text');
-        if (!textContainer) return;
-        const fullText = textContainer.dataset.fullText || '';
-        const mediaContainer = card.querySelector('.post-media-container');
-        const mediaJson = mediaContainer ? mediaContainer.dataset.media : '[]';
-        
-        // 1. Text Folding
-        const LIMIT = 30;
-        if (fullText.length > LIMIT) {
-            const truncated = fullText.substring(0, LIMIT);
-            textContainer.innerHTML = `${formatText(truncated)}... <button class="expand-btn">展开</button>`;
-            
-            card.addEventListener('click', (e) => {
-                if (e.target.classList.contains('expand-btn')) {
-                    e.stopPropagation();
-                    textContainer.innerHTML = `${formatText(fullText)} <button class="collapse-btn">收起</button>`;
-                } else if (e.target.classList.contains('collapse-btn')) {
-                    e.stopPropagation();
-                    textContainer.innerHTML = `${formatText(truncated)}... <button class="expand-btn">展开</button>`;
-                } else if (e.target.tagName === 'A' || e.target.closest('a') || e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.closest('.carousel-prev') || e.target.closest('.carousel-next')) {
-                    return;
-                } else {
-                    const postId = card.dataset.postId;
-                    if (postId) {
-                        window.location.href = `${window.APP_CTX}/app/post?id=${postId}`;
-                    }
-                }
-            });
-        } else {
-            textContainer.innerHTML = formatText(fullText);
-            card.addEventListener('click', (e) => {
-                if (e.target.tagName === 'A' || e.target.closest('a') || e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.closest('.carousel-prev') || e.target.closest('.carousel-next')) {
-                    return;
-                }
-                const postId = card.dataset.postId;
-                if (postId) {
-                    window.location.href = `${window.APP_CTX}/app/post?id=${postId}`;
-                }
-            });
-        }
-        
-        // 2. Media Rendering
-        try {
-            const mediaList = JSON.parse(mediaJson || '[]');
-            if (mediaList.length > 0 && mediaContainer) {
-                mediaContainer.style.display = 'block';
-                renderCarousel(mediaContainer, mediaList);
-            }
-        } catch (e) { console.error('Media parse error', e); }
-    });
-
     function renderCarousel(container, mediaList) {
-        container.innerHTML = ''; // Clear container to prevent duplication
+        container.innerHTML = '';
         const getUrl = (m) => {
             if (m.url) return m.url;
             if (m.path) return `${window.APP_CTX}/static/uploads/${m.path}`;
@@ -117,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (mediaList[0].type && mediaList[0].type.toLowerCase().startsWith('video')) {
             const src = getUrl(mediaList[0]);
-            container.innerHTML = `<video src="${src}" controls class="single-media"></video>`;
+            container.innerHTML = `<video src="${src}" controls class="single-media" style="width:100%"></video>`;
             return;
         }
         
@@ -173,13 +92,224 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function initFeedCard(card) {
+        const textContainer = card.querySelector('.content-text');
+        if (!textContainer) return;
+        const fullText = textContainer.dataset.fullText || '';
+        const mediaContainer = card.querySelector('.post-media-container');
+        const mediaJson = mediaContainer ? mediaContainer.dataset.media : '[]';
+        
+        // Text Folding
+        const LIMIT = 140;
+        if (fullText.length > LIMIT) {
+            const truncated = fullText.substring(0, LIMIT);
+            textContainer.innerHTML = `${formatText(truncated)}... <button class="expand-btn">展开</button>`;
+            
+            card.addEventListener('click', (e) => {
+                if (e.target.classList.contains('expand-btn')) {
+                    e.stopPropagation();
+                    textContainer.innerHTML = `${formatText(fullText)} <button class="collapse-btn">收起</button>`;
+                } else if (e.target.classList.contains('collapse-btn')) {
+                    e.stopPropagation();
+                    textContainer.innerHTML = `${formatText(truncated)}... <button class="expand-btn">展开</button>`;
+                } else if (shouldIgnoreClick(e.target)) {
+                    return;
+                } else {
+                    navigateToPost(card.dataset.postId);
+                }
+            });
+        } else {
+            textContainer.innerHTML = formatText(fullText);
+            card.addEventListener('click', (e) => {
+                if (shouldIgnoreClick(e.target)) return;
+                navigateToPost(card.dataset.postId);
+            });
+        }
+        
+        // Media Rendering
+        try {
+            const mediaList = JSON.parse(mediaJson || '[]');
+            if (mediaList.length > 0 && mediaContainer) {
+                mediaContainer.style.display = 'block';
+                renderCarousel(mediaContainer, mediaList);
+            }
+        } catch (e) { console.error('Media parse error', e); }
+    }
+
+    function shouldIgnoreClick(target) {
+        return target.tagName === 'A' || target.closest('a') || 
+               target.tagName === 'BUTTON' || target.closest('button') || 
+               target.closest('.carousel-prev') || target.closest('.carousel-next') ||
+               target.closest('.metric-item');
+    }
+
+    function navigateToPost(postId) {
+        if (postId) {
+            window.location.href = `${window.APP_CTX}/app/post?id=${postId}`;
+        }
+    }
+
+    // --- Quick Publish Logic ---
+    const quickForm = document.getElementById('quick-publish-form');
+    if (quickForm) {
+        const quickContent = document.getElementById('quick-content');
+        const composeActions = document.getElementById('compose-actions');
+        const suggestionsBox = document.getElementById('mention-suggestions');
+        const mentionBtn = document.querySelector('[data-action="mention"]');
+        const hashtagBtn = document.querySelector('[data-action="hashtag"]');
+
+        quickContent.addEventListener('focus', () => {
+            quickContent.rows = 3;
+            composeActions.style.display = 'flex';
+        });
+
+        mentionBtn?.addEventListener('click', () => insertText('@'));
+        hashtagBtn?.addEventListener('click', () => insertText('#'));
+
+        function insertText(char) {
+            const start = quickContent.selectionStart;
+            const end = quickContent.selectionEnd;
+            const text = quickContent.value;
+            quickContent.value = text.substring(0, start) + char + text.substring(end);
+            quickContent.selectionStart = quickContent.selectionEnd = start + 1;
+            quickContent.focus();
+            quickContent.dispatchEvent(new Event('input'));
+        }
+
+        quickContent.addEventListener('input', async (e) => {
+            const cursor = quickContent.selectionStart;
+            const text = quickContent.value;
+            const beforeCursor = text.substring(0, cursor);
+            
+            const lastAt = beforeCursor.lastIndexOf('@');
+            const lastHash = beforeCursor.lastIndexOf('#');
+            
+            let triggerChar = null;
+            let triggerIndex = -1;
+            
+            if (lastAt > lastHash) {
+                triggerChar = '@';
+                triggerIndex = lastAt;
+            } else if (lastHash > lastAt) {
+                triggerChar = '#';
+                triggerIndex = lastHash;
+            }
+            
+            if (triggerIndex !== -1) {
+                const query = beforeCursor.substring(triggerIndex + 1);
+                if (!/\s/.test(query)) {
+                    await showSuggestions(triggerChar, query, triggerIndex);
+                    return;
+                }
+            }
+            suggestionsBox.style.display = 'none';
+        });
+
+        async function showSuggestions(type, query, atIndex) {
+            if (!query) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+            try {
+                let items = [];
+                if (type === '@') {
+                    items = await window.apiGet(`/users?q=${encodeURIComponent(query)}`);
+                } else if (type === '#') {
+                    items = await window.apiGet(`/posts/tags?q=${encodeURIComponent(query)}`);
+                }
+
+                if (!items || items.length === 0) {
+                    suggestionsBox.style.display = 'none';
+                    return;
+                }
+                
+                suggestionsBox.innerHTML = '';
+                items.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    
+                    if (type === '@') {
+                        const avatar = `${window.APP_CTX}/api/users/${item.id}/avatar`;
+                        div.innerHTML = `
+                            <img src="${avatar}" onerror="this.style.display='none'">
+                            <div>
+                                <strong>${item.displayName || item.username}</strong>
+                                <span>@${item.username}</span>
+                            </div>
+                        `;
+                        div.addEventListener('click', () => {
+                            insertSuggestion(item.displayName || item.username, atIndex);
+                        });
+                    } else {
+                        div.innerHTML = `<div><strong>#${item}</strong></div>`;
+                        div.addEventListener('click', () => {
+                            insertSuggestion(item, atIndex);
+                        });
+                    }
+                    suggestionsBox.appendChild(div);
+                });
+                suggestionsBox.style.display = 'block';
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function insertSuggestion(text, atIndex) {
+            const content = quickContent.value;
+            const before = content.substring(0, atIndex + 1);
+            const after = content.substring(quickContent.selectionStart);
+            quickContent.value = `${before}${text} ${after}`;
+            suggestionsBox.style.display = 'none';
+            quickContent.focus();
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!quickForm.contains(e.target)) {
+                suggestionsBox.style.display = 'none';
+                if (quickContent.value.trim() === '') {
+                    quickContent.rows = 1;
+                    composeActions.style.display = 'none';
+                }
+            }
+        });
+        
+        quickForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const content = quickContent.value.trim();
+            if (!content) return;
+            try {
+                await window.apiPost('/posts', { contentText: content, mediaMetaJson: '[]' });
+                window.location.reload();
+            } catch (err) { alert('发布失败: ' + err.message); }
+        });
+    }
+
+    // --- Infinite Scroll Logic ---
+    async function loadMore() {
+        if (loading || finished) return;
+        loading = true;
+        try {
+            const params = new URLSearchParams({ offset, limit, feed: 'true' });
+            const data = await window.apiGet(`/posts?${params}`);
+            renderFeed(data.items || []);
+            offset += limit;
+            if (!data.items || data.items.length < limit) {
+                finished = true;
+                sentinel.textContent = '没有更多了';
+            }
+        } catch (err) {
+            sentinel.textContent = err.message;
+        } finally {
+            loading = false;
+        }
+    }
+
     function renderFeed(items) {
         items.forEach((item) => {
             const card = document.createElement('article');
             card.className = 'card feed-card';
             card.dataset.postId = item.id;
             
-            // Construct media JSON safely
             const mediaJson = item.mediaMetaJson || '[]';
             
             card.innerHTML = `
@@ -199,12 +329,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="time-line">${new Date(item.createdAt || Date.now()).toLocaleString().replace(/\//g, '-').replace('T', ' ')}</span>
                     </div>
                     
-                    <!-- Text Content -->
                     <div class="post-text-container">
                         <span class="content-text" data-full-text="${(item.contentText || '').replace(/"/g, '&quot;')}"></span>
                     </div>
 
-                    <!-- Media Content -->
                     <div class="post-media-container" style="display:none;" data-media='${mediaJson}'></div>
                     
                     <div class="metrics">
@@ -227,67 +355,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             feedList.appendChild(card);
-            
-            // Apply logic to new card
-            const textContainer = card.querySelector('.content-text');
-            const fullText = item.contentText || '';
-            const mediaContainer = card.querySelector('.post-media-container');
-            
-            // 1. Text Folding
-            const LIMIT = 140; // Increased limit for better reading
-            if (fullText.length > LIMIT) {
-                const truncated = fullText.substring(0, LIMIT);
-                textContainer.innerHTML = `${formatText(truncated)}... <button class="expand-btn">展开</button>`;
-                
-                card.addEventListener('click', (e) => {
-                    // ...existing code...
-                    if (e.target.classList.contains('expand-btn')) {
-                        e.stopPropagation();
-                        textContainer.innerHTML = `${formatText(fullText)} <button class="collapse-btn">收起</button>`;
-                    } else if (e.target.classList.contains('collapse-btn')) {
-                        e.stopPropagation();
-                        textContainer.innerHTML = `${formatText(truncated)}... <button class="expand-btn">展开</button>`;
-                    } else if (e.target.closest('.metric-item')) {
-                        // Handle metric clicks separately
-                        return;
-                    } else if (e.target.tagName === 'A' || e.target.closest('a') || e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.closest('.carousel-prev') || e.target.closest('.carousel-next')) {
-                        return;
-                    } else {
-                        window.location.href = `${window.APP_CTX}/app/post?id=${item.id}`;
-                    }
-                });
-            } else {
-                textContainer.innerHTML = formatText(fullText);
-                card.addEventListener('click', (e) => {
-                    if (e.target.closest('.metric-item')) {
-                        return;
-                    }
-                    if (e.target.tagName === 'A' || e.target.closest('a') || e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.closest('.carousel-prev') || e.target.closest('.carousel-next')) {
-                        return;
-                    }
-                    window.location.href = `${window.APP_CTX}/app/post?id=${item.id}`;
-                });
-            }
-            
-            // 2. Media Rendering
-            try {
-                const mediaList = JSON.parse(mediaJson);
-                if (mediaList.length > 0 && mediaContainer) {
-                    mediaContainer.style.display = 'block';
-                    renderCarousel(mediaContainer, mediaList);
-                }
-            } catch (e) { console.error('Media parse error', e); }
+            initFeedCard(card);
         });
     }
 
-        // ...existing code...
-    // Initial Load
-    loadFeed();
+    // Initialize existing cards
+    document.querySelectorAll('.feed-card').forEach(initFeedCard);
 
     // Infinite Scroll
     window.addEventListener('scroll', () => {
         if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
-            loadFeed();
+            loadMore();
         }
     });
 });
