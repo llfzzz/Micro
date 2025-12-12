@@ -119,10 +119,11 @@ public class  PostDaoImpl extends BaseDao implements PostDao {
 
     @Override
     public boolean softDelete(long postId, long operatorId) {
-        String sql = "UPDATE posts SET is_deleted=1, updated_at=CURRENT_TIMESTAMP WHERE id=?";
+        String sql = "UPDATE posts SET is_deleted=1, updated_at=CURRENT_TIMESTAMP WHERE id=? AND user_id=?";
         try (Connection connection = getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, postId);
+            ps.setLong(2, operatorId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new IllegalStateException("Unable to delete post", e);

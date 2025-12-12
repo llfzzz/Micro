@@ -23,9 +23,28 @@ document.addEventListener('DOMContentLoaded', () => {
             const username = btn.dataset.username;
             const displayName = btn.dataset.displayname;
             openCommentModal(id, username, displayName);
+        } else if (action === 'delete') {
+            handleDelete(btn, id);
         }
     });
 });
+
+async function handleDelete(btn, postId) {
+    if (confirm('确定要删除这条动态吗？')) {
+        try {
+            await window.apiDelete(`/posts/${postId}`);
+            const card = btn.closest('.feed-card');
+            if (card) {
+                card.style.transition = 'opacity 0.3s ease, height 0.3s ease';
+                card.style.opacity = '0';
+                setTimeout(() => card.remove(), 300);
+            }
+        } catch (e) {
+            console.error('Delete failed', e);
+            alert('删除失败: ' + e.message);
+        }
+    }
+}
 
 async function handleLike(btn, postId) {
     try {
