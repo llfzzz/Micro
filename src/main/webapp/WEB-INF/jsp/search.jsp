@@ -123,8 +123,7 @@
 <script>window.APP_CTX='${ctx}';</script>
 <script src="${ctx}/static/js/api.js"></script>
 <script src="${ctx}/static/js/feed.js?v=2" defer></script>
-<script src="${ctx}/static/js/interactions.js" defer></script>
-<script src="${ctx}/static/js/auth.js?v=2" defer></script>
+<script src="${ctx}/static/js/auth.js" defer></script>
 <script>
     // Cleanup legacy "View Detail" links if they exist
     document.addEventListener('DOMContentLoaded', () => {

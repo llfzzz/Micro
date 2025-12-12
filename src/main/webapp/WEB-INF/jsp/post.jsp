@@ -90,7 +90,6 @@
 <script>window.APP_CTX='${ctx}';</script>
 <script src="${ctx}/static/js/api.js"></script>
 <script src="${ctx}/static/js/post.js?v=7" defer></script>
-<script src="${ctx}/static/js/interactions.js" defer></script>
 <script src="${ctx}/static/js/auth.js" defer></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
