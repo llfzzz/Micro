@@ -20,7 +20,9 @@ public interface PostDao {
 
     long countAdmin(Long userId, String keyword, String visibility, Boolean deleted);
 
-    boolean softDelete(long postId, long operatorId);
+    boolean delete(long postId, long operatorId);
+
+    boolean delete(long postId);
 
     boolean updateCounts(long postId, int likeDelta, int commentDelta, int forwardDelta);
 

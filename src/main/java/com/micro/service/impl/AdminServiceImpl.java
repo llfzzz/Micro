@@ -54,7 +54,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public boolean deletePost(long postId) {
-        return postDao.softDelete(postId, 0L);
+        return postDao.delete(postId);
     }
 
     @Override

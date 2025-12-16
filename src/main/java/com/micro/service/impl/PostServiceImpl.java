@@ -40,7 +40,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public boolean deletePost(long postId, long operatorId) {
-        return postDao.softDelete(postId, operatorId);
+        return postDao.delete(postId, operatorId);
     }
 
     @Override

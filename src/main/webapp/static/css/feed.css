@@ -465,20 +465,3 @@
 .profile-link:hover .display-name {
     text-decoration: underline;
 }
-
-/* Delete Button - In Metrics Bar */
-.delete-post-btn {
-    color: #536471;
-    opacity: 0; /* Hidden by default */
-    transition: opacity 0.2s ease-in-out;
-    margin-left: auto; /* Push to right */
-}
-
-.delete-post-btn:hover {
-    color: #e0245e;
-    background-color: rgba(224, 36, 94, 0.1);
-}
-
-.feed-card:hover .delete-post-btn {
-    opacity: 1; /* Show on hover */
-}
