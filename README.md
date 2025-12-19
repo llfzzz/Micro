@@ -377,5 +377,5 @@ taskkill /PID <PID> /F
 ---
 
 <p align="center">
-  Made with ❤️ by Micro Team
+  Made with ❤️ by PL shi shabi
 </p>
