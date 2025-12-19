@@ -93,7 +93,7 @@ public class  PostDaoImpl extends BaseDao implements PostDao {
     @Override
     public List<Post> adminSearch(Long userId, String keyword, String visibility, Boolean deleted, int offset, int limit) {
         StringBuilder sql = new StringBuilder(BASE_SELECT).append(" WHERE 1=1");
-        var params = new ArrayList<Object>();
+        var params = new ArrayList<>();
         appendPostFilters(sql, params, userId, keyword, visibility, deleted);
         sql.append(" ORDER BY created_at DESC LIMIT ? OFFSET ?");
         params.add(limit);
@@ -104,7 +104,7 @@ public class  PostDaoImpl extends BaseDao implements PostDao {
     @Override
     public long countAdmin(Long userId, String keyword, String visibility, Boolean deleted) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM posts WHERE 1=1");
-        var params = new ArrayList<Object>();
+        var params = new ArrayList<>();
         appendPostFilters(sql, params, userId, keyword, visibility, deleted);
         try (Connection connection = getConnection();
              PreparedStatement ps = connection.prepareStatement(sql.toString())) {
@@ -180,7 +180,7 @@ public class  PostDaoImpl extends BaseDao implements PostDao {
 
     private Optional<Post> queryOne(String sql, PreparedStatementSetter setter) {
         List<Post> posts = queryList(sql, setter);
-        return posts.isEmpty() ? Optional.empty() : Optional.of(posts.get(0));
+        return posts.isEmpty() ? Optional.empty() : Optional.of(posts.getFirst());
     }
 
     private List<Post> queryList(String sql, PreparedStatementSetter setter) {
@@ -244,14 +244,11 @@ public class  PostDaoImpl extends BaseDao implements PostDao {
     private void setParams(PreparedStatement ps, List<Object> params) throws SQLException {
         for (int i = 0; i < params.size(); i++) {
             Object value = params.get(i);
-            if (value instanceof String) {
-                ps.setString(i + 1, (String) value);
-            } else if (value instanceof Integer) {
-                ps.setInt(i + 1, (Integer) value);
-            } else if (value instanceof Long) {
-                ps.setLong(i + 1, (Long) value);
-            } else {
-                ps.setObject(i + 1, value);
+            switch (value) {
+                case String s -> ps.setString(i + 1, s);
+                case Integer integer -> ps.setInt(i + 1, integer);
+                case Long l -> ps.setLong(i + 1, l);
+                case null, default -> ps.setObject(i + 1, value);
             }
         }
     }

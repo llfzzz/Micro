@@ -262,7 +262,7 @@ public class UserDaoImpl extends BaseDao implements UserDao {
 
     private Optional<User> queryOne(String sql, PreparedStatementSetter setter) {
         List<User> users = queryList(sql, setter);
-        return users.isEmpty() ? Optional.empty() : Optional.of(users.get(0));
+        return users.isEmpty() ? Optional.empty() : Optional.of(users.getFirst());
     }
 
     private List<User> queryList(String sql, PreparedStatementSetter setter) {
@@ -323,16 +323,12 @@ public class UserDaoImpl extends BaseDao implements UserDao {
     private void setParams(PreparedStatement ps, List<Object> params) throws SQLException {
         for (int i = 0; i < params.size(); i++) {
             Object value = params.get(i);
-            if (value instanceof String) {
-                ps.setString(i + 1, (String) value);
-            } else if (value instanceof Integer) {
-                ps.setInt(i + 1, (Integer) value);
-            } else if (value instanceof Long) {
-                ps.setLong(i + 1, (Long) value);
-            } else if (value instanceof Boolean) {
-                ps.setBoolean(i + 1, (Boolean) value);
-            } else {
-                ps.setObject(i + 1, value);
+            switch (value) {
+                case String s -> ps.setString(i + 1, s);
+                case Integer integer -> ps.setInt(i + 1, integer);
+                case Long l -> ps.setLong(i + 1, l);
+                case Boolean b -> ps.setBoolean(i + 1, b);
+                case null, default -> ps.setObject(i + 1, value);
             }
         }
     }

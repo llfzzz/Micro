@@ -106,7 +106,7 @@ public class FollowServlet extends BaseServlet {
         }
         List<Map<String, Object>> items = users.stream()
                 .map(this::summarizeUser)
-                .collect(Collectors.toList());
+                .toList();
         writeSuccess(resp, Map.of(
                 "items", items,
                 "offset", offset,

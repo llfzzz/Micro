@@ -1,14 +1,6 @@
 package com.micro.entity;
 
-public class UserImage {
-    private byte[] data;
-    private String contentType;
-
-    public UserImage(byte[] data, String contentType) {
-        this.data = data;
-        this.contentType = contentType;
-    }
-
+public record UserImage(byte[] data, String contentType) {
     public byte[] getData() {
         return data;
     }

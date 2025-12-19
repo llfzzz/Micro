@@ -341,16 +341,9 @@ public class PageServlet extends HttpServlet {
 			req.setAttribute("userList", users);
 		} else {
 			// Search posts (including #tags)
-			// If query starts with #, we can strip it or just let the LIKE query handle it.
-			// But usually #tag search is exact or prefix.
-			// Our current adminSearch uses LIKE %keyword%, which works for #tag too.
-			// If user types "#java", it searches for "%#java%".
-			String keyword = query;
-			if (keyword.startsWith("#")) {
-				// Optional: if we want to search for the tag specifically, we might want to keep the #.
-				// But if the user just wants to search posts containing the tag, LIKE is fine.
-			}
-			List<Post> posts = postService.search(keyword, 0, 20);
+			// Current implementation uses LIKE %keyword%, which works for both plain text and #tag searches
+			// If user types "#java", it searches for "%#java%" in post content
+			List<Post> posts = postService.search(query, 0, 20);
 			req.setAttribute("searchType", "posts");
 			long viewerId = getSessionUserId(req);
 			req.setAttribute("feedList", buildPostView(posts, viewerId));

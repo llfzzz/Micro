@@ -36,10 +36,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public boolean deleteComment(long commentId, long operatorId) {
-        boolean result = commentDao.softDelete(commentId, operatorId);
-        if (result) {
-            // cannot determine postId without extra query; rely on triggers or follow-up fetch in higher layer if needed
-        }
-        return result;
+        // Note: Comment count update is handled by database triggers or should be done at a higher layer
+        // as we cannot determine postId without an extra query
+        return commentDao.softDelete(commentId, operatorId);
     }
 }

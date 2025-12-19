@@ -173,64 +173,15 @@ public class AppContextListener implements ServletContextListener {
         throw new IllegalStateException("Components not initialized");
     }
 
-    public static final class Components {
-        private final UserService userService;
-        private final AuthService authService;
-        private final PostService postService;
-        private final CommentService commentService;
-        private final MediaService mediaService;
-        private final AdminService adminService;
-        private final FollowDao followDao;
-        private final FollowService followService;
-
-        public Components(UserService userService,
-                          AuthService authService,
-                          PostService postService,
-                          CommentService commentService,
-                          MediaService mediaService,
-                          AdminService adminService,
-                          FollowDao followDao,
-                          FollowService followService) {
-            this.userService = userService;
-            this.authService = authService;
-            this.postService = postService;
-            this.commentService = commentService;
-            this.mediaService = mediaService;
-            this.adminService = adminService;
-            this.followDao = followDao;
-            this.followService = followService;
-        }
-
-        public UserService userService() {
-            return userService;
-        }
-
-        public AuthService authService() {
-            return authService;
-        }
-
-        public PostService postService() {
-            return postService;
-        }
-
-        public CommentService commentService() {
-            return commentService;
-        }
-
-        public MediaService mediaService() {
-            return mediaService;
-        }
-
-        public AdminService adminService() {
-            return adminService;
-        }
-
-        public FollowDao followDao() {
-            return followDao;
-        }
-
-        public FollowService followService() {
-            return followService;
-        }
+    public record Components(
+            UserService userService,
+            AuthService authService,
+            PostService postService,
+            CommentService commentService,
+            MediaService mediaService,
+            AdminService adminService,
+            FollowDao followDao,
+            FollowService followService
+    ) {
     }
 }

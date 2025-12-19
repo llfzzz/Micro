@@ -40,7 +40,7 @@ public class Post {
             return Collections.emptyList();
         }
         try {
-            return JsonUtil.mapper().readValue(mediaMetaJson, new TypeReference<List<Map<String, Object>>>(){});
+            return JsonUtil.mapper().readValue(mediaMetaJson, new TypeReference<>(){});
         } catch (Exception e) {
             return Collections.emptyList();
         }

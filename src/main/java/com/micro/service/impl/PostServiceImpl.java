@@ -59,7 +59,7 @@ public class PostServiceImpl implements PostService {
             postDao.updateCounts(postId, 1, 0, 0);
             return true;
         }
-        return alreadyLiked;
+        return false;
     }
 
     @Override
