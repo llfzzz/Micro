@@ -1,4 +1,4 @@
-# Micro 微博社交平台
+# Micro 社交平台
 
 <p align="center">
   <img src="https://img.shields.io/badge/Java-17+-orange.svg" alt="Java">
@@ -9,7 +9,7 @@
 
 ## 📖 项目简介
 
-Micro 是一个基于 Java Web 技术栈开发的轻量级微博社交平台。项目采用经典的 MVC 分层架构，实现了完整的社交媒体核心功能，包括用户认证、动态发布、社交互动、关注关系管理及后台管理等功能模块。
+Micro 是一个基于 Java Web 技术栈开发的轻量级社交平台。项目采用经典的 MVC 分层架构，实现了完整的社交媒体核心功能，包括用户认证、动态发布、社交互动、关注关系管理及后台管理等功能模块。
 
 ### ✨ 主要功能
 
@@ -92,7 +92,7 @@ cd Micro
 
 #### 4.1 创建数据库
 
-打开 MySQL 客户端（命令行或 Navicat/DBeaver 等工具），执行以下 SQL：
+打开 MySQL 客户端（命令行或 DataGrip/Navicat 等工具），执行以下 SQL：
 
 ```sql
 -- 创建数据库
@@ -371,8 +371,8 @@ taskkill /PID <PID> /F
 
 如有问题或建议，欢迎通过以下方式联系：
 
-- 提交 [Issue](https://github.com/your-username/Micro/issues)
-- 发送邮件至：your-email@example.com
+- 提交 [Issue](https://github.com/llfzzz/Micro/issues)
+- 发送邮件至：luofangzheng26@gmail.com
 
 ---
 
