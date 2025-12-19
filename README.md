@@ -86,8 +86,6 @@ cd Micro
 4. 设置 **Language level** 为 `17 - Sealed types, always-strict floating-point semantics`
 5. 点击 **Apply** 保存
 
-![Project Structure](https://via.placeholder.com/600x300?text=Project+Structure+Settings)
-
 ### 第四步：配置数据库
 
 #### 4.1 创建数据库
