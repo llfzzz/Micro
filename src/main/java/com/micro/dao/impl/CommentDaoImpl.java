@@ -16,8 +16,6 @@ import java.util.List;
 
 public class CommentDaoImpl extends BaseDao implements CommentDao {
 
-    private static final String BASE_SELECT = "SELECT id, post_id, user_id, parent_comment_id, content, is_deleted, created_at FROM comments";
-
     public CommentDaoImpl(DataSource dataSource) {
         super(dataSource);
     }
