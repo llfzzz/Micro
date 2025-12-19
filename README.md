@@ -59,10 +59,10 @@ Micro 是一个基于 Java Web 技术栈开发的轻量级社交平台。项目�
 
 ```bash
 # 使用 HTTPS
-git clone https://github.com/your-username/Micro.git
+git clone https://github.com/llfzzz/Micro.git
 
 # 或使用 SSH
-git clone git@github.com:your-username/Micro.git
+git clone git@github.com:llfzzz/Micro.git
 
 # 进入项目目录
 cd Micro
